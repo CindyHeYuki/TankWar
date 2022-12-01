@@ -20,15 +20,15 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.bmp">
+    <Image Include="tank.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.ico">
+    <Image Include="tank.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.rc">
+    <ResourceCompile Include="tank.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

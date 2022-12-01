@@ -145,11 +145,11 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.bmp" />
-    <Image Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.ico" />
+    <Image Include="tank.bmp" />
+    <Image Include="tank.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\Desktop\汇编语言\上机作业\Game\tank-source\src\tank.rc" />
+    <ResourceCompile Include="tank.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
