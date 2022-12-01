@@ -1,0 +1,9 @@
+
+*.db
+*.opendb
+*.ilk
+*.pdb
+*.log
+*.tlog
+*.lastbuildstate
+*.suo
