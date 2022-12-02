@@ -195,23 +195,23 @@ WinMain:
 		call Randomize
 
 		push NULL
-		call GetModuleHandle
+		call GetModuleHandle;检索指定模块的模块句柄。win32
 		mov hInstance,eax
 		
 		push 999
 		push hInstance
-		call LoadIcon
+		call LoadIcon;从与应用程序实例关联的可执行文件 (.exe) 加载指定的图标资源。
 		mov MainWin.hIcon,eax
 
 		push IDC_ARROW
 		push NULL
-		call LoadCursor
+		call LoadCursor;从与应用程序实例关联的可执行 (.EXE) 文件中加载指定的游标资源。
 		mov MainWin.hCursor,eax
 		
 		push offset MainWin
-		call RegisterClass
-		cmp eax,0
-		je ExitProgram
+		call RegisterClass;注册一个窗口类，以便在对 CreateWindow 或 CreateWindowEx 函数的调用中随后使用。
+		cmp eax,0;如果函数失败，则返回值为零。
+		je ExitProgram;窗口加载失败退出
 		
 		push NULL
 		push hInstance
@@ -225,32 +225,32 @@ WinMain:
 		push offset WindowName
 		push offset className
 		push 0
-		call CreateWindowEx
+		call CreateWindowEx;Creates an overlapped, pop-up, or child window with an extended window style
 		cmp eax,0
 		je ExitProgram
 		mov hMainWnd,eax
 		
-		push SW_SHOW
+		push SW_SHOW;激活窗口并以当前大小和位置显示窗口。
 		push hMainWnd
-		call ShowWindow
+		call ShowWindow;设置指定窗口的显示状态。
 		
 		push hMainWnd
-		call UpdateWindow
+		call UpdateWindow;UpdateWindow 函数通过将WM_PAINT消息发送到窗口来更新指定窗口的工作区（如果窗口的更新区域不为空）。
 		
-	MessageLoop:
+	MessageLoop:;读取message
 		push NULL
 		push NULL
 		push NULL
 		push offset msg
-		call GetMessage
+		call GetMessage;Retrieves a message from the calling thread's message queue.
 		
 		cmp eax,0
 		je ExitProgram
 		
 		push offset msg
-		call TranslateMessage
+		call TranslateMessage;将虚拟密钥消息转换为字符消息。 字符消息将发布到调用线程的消息队列，下次线程调用 GetMessage 或 PeekMessage 函数时要读取。
 		push offset msg
-		call DispatchMessage
+		call DispatchMessage;将消息调度到窗口过程。 它通常用于调度 GetMessage 函数检索的消息。
 		
 		jmp MessageLoop
 
@@ -265,9 +265,9 @@ WinProc:
 		
 		mov eax,[ebp+12]
 		
-		cmp eax,WM_KEYDOWN
+		cmp eax,WM_KEYDOWN;光标向下
 		je KeyDownMessage
-		cmp eax,WM_KEYUP
+		cmp eax,WM_KEYUP;光标向上
 		je KeyUpMessage
 		cmp eax,WM_CREATE
 		je CreateWindowMessage
@@ -388,14 +388,14 @@ WinProc:
 		push 30
 		push 1
 		push hMainWnd
-		call SetTimer
+		call SetTimer;创建具有指定超时值的计时器。
 	
 		push hMainWnd
-		call GetDC
+		call GetDC;GetDC 函数检索指定窗口或整个屏幕的工作区的设备上下文 (DC) 的句柄。
 		mov hdc,eax
 		
 		push eax
-		call CreateCompatibleDC
+		call CreateCompatibleDC;CreateCompatibleDC 函数 (DC) 创建与指定设备兼容的内存设备上下文。
 		mov hdcPic,eax
 		
 		push 0
@@ -404,12 +404,12 @@ WinProc:
 		push 0
 		push 1001
 		push hInstance
-		call LoadImageA
+		call LoadImageA;加载图标、游标、动画游标或位图。
 		mov hbitmap,eax
 		
 		push hbitmap
 		push hdcPic
-		call SelectObject
+		call SelectObject;SelectObject 函数将对象选择到指定的设备上下文中， (DC) 。 新对象替换同一类型的上一个对象。
 
 		push hdc
 		call CreateCompatibleDC
@@ -418,7 +418,7 @@ WinProc:
 		push 480
 		push 640
 		push hdc
-		call CreateCompatibleBitmap
+		call CreateCompatibleBitmap;CreateCompatibleBitmap 函数创建与与指定设备上下文关联的设备的位图。
 		mov hbitmap,eax
 		
 		push hbitmap
@@ -427,46 +427,46 @@ WinProc:
 		
 		push 0FFFFFFh
 		push hdcMem
-		call SetTextColor
+		call SetTextColor;SetTextColor 函数将指定设备上下文的文本颜色设置为指定颜色。
 		
 		push 0
 		push hdcMem
-		call SetBkColor
+		call SetBkColor;SetBkColor 函数将当前背景色设置为指定的颜色值;
 
 		push hdc
 		push hMainWnd
-		call ReleaseDC
+		call ReleaseDC;The ReleaseDC function releases a device context (DC), freeing it for use by other applications. 
 
 		jmp WinProcExit
 		
 	CloseWindowMessage:
 		push 0
-		call PostQuitMessage
+		call PostQuitMessage;向系统指示线程已发出终止 (退出) 的请求。 它通常用于响应 WM_DESTROY 消息。
 		push 1
 		push hMainWnd
-		call KillTimer
+		call KillTimer;销毁指定的计时器。
 		jmp WinProcExit
 		
 	PaintMessage:
 		push offset ps
 		push hMainWnd
-		call BeginPaint
+		call BeginPaint;BeginPaint 函数准备用于绘制的指定窗口，并使用有关绘图的信息填充 PAINTSTRUCT 结构。
 		mov hdc,eax
 
 		push BLACK_BRUSH
-		call GetStockObject
+		call GetStockObject;GetStockObject 函数检索某个股票笔、画笔、字体或调色板的句柄。
 		
 		push eax
 		push hdcMem
-		call SelectObject
+		call SelectObject;SelectObject 函数将对象选择到指定的设备上下文中， (DC) 。 新对象替换同一类型的上一个对象。
 		mov holdbr,eax
 		
 		push SYSTEM_FIXED_FONT
-		call GetStockObject
+		call GetStockObject;GetStockObject 函数检索某个股票笔、画笔、字体或调色板的句柄。
 		
 		push eax
 		push hdcMem
-		call SelectObject
+		call SelectObject;SelectObject 函数将对象选择到指定的设备上下文中， (DC) 。 新对象替换同一类型的上一个对象。
 		mov holdft,eax
 		
 		push 480
@@ -474,7 +474,7 @@ WinProc:
 		push 0
 		push 0
 		push hdcMem
-		call Rectangle
+		call Rectangle;Rectangle 函数绘制矩形。 该矩形使用当前笔轮廓，并使用当前画笔填充。
 
 		call DrawUI
 		
@@ -495,11 +495,11 @@ WinProc:
 		push 0
 		push 0
 		push hdc
-		call BitBlt
+		call BitBlt;BitBlt 函数执行与从指定源设备上下文到目标设备上下文中的像素矩形对应的颜色数据的位块传输。
 		
 		push offset ps
 		push hMainWnd
-		call EndPaint
+		call EndPaint;EndPaint 函数标记指定窗口中绘制的结尾。 每次调用 BeginPaint 函数时都需要此函数，但仅在绘制完成后才需要此函数。
 		
 		jmp WinProcExit
 	
@@ -511,7 +511,7 @@ WinProc:
 		push NULL
 		push NULL
 		push hMainWnd
-		call RedrawWindow
+		call RedrawWindow;RedrawWindow 函数更新窗口的工作区中的指定矩形或区域。
 
 		jmp WinProcExit
 		
@@ -520,7 +520,7 @@ WinProc:
 		push [ebp+16]
 		push [ebp+12]
 		push [ebp+8]
-		call DefWindowProc
+		call DefWindowProc;调用默认窗口过程，为应用程序未处理的任何窗口消息提供默认处理。 此函数可确保处理每个消息。 使用窗口过程收到的相同参数调用 DefWindowProc。
 		
 	WinProcExit:
 		mov esp,ebp
@@ -701,7 +701,7 @@ DrawHalfSpirit:
 		add edx,[DrawHalfSpiritMask+32+ecx*4]
 		push edx
 		push hdcMem
-		call TransparentBlt
+		call TransparentBlt;TransparentBlt 函数执行与从指定源设备上下文到目标设备上下文中的像素矩形对应的颜色数据的位块传输。
 
 		pop edx
 		pop ecx
@@ -732,7 +732,7 @@ DrawSpirit:
 		push [DWORD PTR ebp+16]
 		push [DWORD PTR ebp+12]
 		push hdcMem
-		call TransparentBlt
+		call TransparentBlt;TransparentBlt 函数执行与从指定源设备上下文到目标设备上下文中的像素矩形对应的颜色数据的位块传输。
 
 		mov esp,ebp
 		pop ebp
@@ -846,10 +846,10 @@ EnterInMenu:
 	
 	EnterToEndGame:
 		push 0
-		call PostQuitMessage
+		call PostQuitMessage;向系统指示线程已发出终止 (退出) 的请求。 它通常用于响应 WM_DESTROY 消息。
 		push 1
 		push hMainWnd
-		call KillTimer
+		call KillTimer;销毁指定的计时器。
 	
 	EnterInMenuReturn:
 		pop eax
@@ -1172,7 +1172,7 @@ DrawSideBar:
 		push eax
 		push 608
 		push hdcMem
-		call TextOut
+		call TextOut;TextOut 函数使用当前选定的字体、背景色和文本颜色在指定位置写入一个字符串。
 		
 		pop eax
 		pop ecx
@@ -1217,7 +1217,7 @@ DrawSideBar:
 		push edi
 		push 576
 		push hdcMem
-		call TextOut
+		call TextOut;TextOut 函数使用当前选定的字体、背景色和文本颜色在指定位置写入一个字符串。
 
 		push 2Fh
 		push 2Eh
