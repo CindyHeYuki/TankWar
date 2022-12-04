@@ -7,3 +7,6 @@
 *.tlog
 *.lastbuildstate
 *.suo
+Debug/TankWar.exe
+.vs/TankWar/v15/Browse.VC.db
+.vs/TankWar/v15/.suo
