@@ -31,5 +31,6 @@ main.asm最开始使用绝对路径导入三个包，你需要将support文件�
 
 前面说了，都是windows的API，那为什么不干脆去windows官网看呢，虽然你看到的是C语言，但是实际上汇编里调用C语言和C语言语法几乎是一模一样的，你能获得的，是一个完善到恐怖的API文档：
 
-> [Win32API之图像](https://learn.microsoft.com/zh-cn/windows/win32/gdi/windows-gdi)
-> [Win32API之消息与事件](https://learn.microsoft.com/zh-cn/windows/win32/api/_winmsg/)
+> [Win32API之图像](https://learn.microsoft.com/zh-cn/windows/win32/gdi/windows-gdi)  
+> [Win32API之消息与事件](https://learn.microsoft.com/zh-cn/windows/win32/api/_winmsg/)  
+> [找不到就看这里](https://learn.microsoft.com/zh-cn/windows/win32/api/_menurc/)

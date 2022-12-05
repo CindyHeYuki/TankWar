@@ -7,7 +7,7 @@
 .386
 .model flat, STDCALL
 
-
+;使用相对路径导入support文件夹中的三个库
 INCLUDE	..\support\GraphWin.inc
 INCLUDE gdi32.inc
 INCLUDE msimg32.inc
@@ -61,12 +61,12 @@ RandomPlace DWORD 64, 224, 384
 
 WaterSpirit DWORD ? ; 水的图片，需要x / 8 + 3
 WhichMenu DWORD 0; 哪个界面，0表示开始，1表示选择游戏模式，2表示正在游戏，3表示游戏结束
-ButtonNumber DWORD 2, 5, 0, 2; 每个界面下的图标数
+ButtonNumber DWORD 2, 5, 0, 2; 每个界面下的选项数
 SelectMenu DWORD 0; 正在选择的菜单项
 GameMode DWORD 0; 游戏模式 0为闯关模式，1为挑战模式
-IsDoublePlayer DWORD 0; 是双人游戏
+IsDoublePlayer DWORD 0; 游戏模式，00是单人游戏，11是双人游戏
 
-;按键操作部分
+;按键操作部分，按下就会变成1，否则就是0
 UpKeyHold DWORD 0
 DownKeyHold DWORD 0
 LeftKeyHold DWORD 0
@@ -849,78 +849,100 @@ DrawLine:
 	DrawLineReturn:
 		ret 12
 
+;按键控制
+;上下按键会影响SelectMenu值，下一次渲染的时候根据SelectMenu值确定箭头位置
+;上
 UpInMenu:
-;selectmenu值的变化过程。。。
+		;上移，界限为当前界面的第一个选项	
 		dec SelectMenu
-		cmp SelectMenu,0
+		cmp SelectMenu,0 ;if SelectMenu<0 then SelectMenu=0（保证菜单在范围内）
 		jnl UpInMenuReturn
-		mov SelectMenu,0
+		mov SelectMenu,0	
 	UpInMenuReturn:
 		ret
-		
+;下		
 DownInMenu:
-;选择键的上下移动
-		push eax
+		;下移，界限为当前界面的最后一个选项	
+		push eax;被调用保护eax
 		inc SelectMenu
 		mov ebx,WhichMenu
-		mov eax,[ButtonNumber+ebx*4]
-		dec eax
-		cmp SelectMenu,eax
+		mov eax,[ButtonNumber+ebx*4];获取当前页面内的最大选项数
+		dec eax; 修正，把最大图标数转为最大选项索引
+		cmp SelectMenu,eax	;if SelectMenu>最大索引 then SelectMenu=最大索引
 		jng DownInMenuReturn
 		mov SelectMenu,eax
 	DownInMenuReturn:
 		pop eax
 		ret
-		
+;enter/space键响应		
 EnterInMenu:
-;munu的跳转
-		push eax
-		cmp WhichMenu,2
+		;本函数大量使用if-else if-else if-else的分支判断
+		push eax;保护eax
+		;第一层分支，判断当前所处界面
+		cmp WhichMenu,2	;游戏界面，直接跳出分支（保留EnterHold和SpaceHold，刷新的时候要用这个发子弹）
 		je EnterInMenuReturn
-		mov SpaceKeyHold,0
+		mov SpaceKeyHold,0;不发射子弹则清零两个键（防止影响子弹发射）
 		mov EnterKeyHold,0
-		
-		cmp WhichMenu,0
+		cmp WhichMenu,0	;初始界面
 		je EnterInMain
-		cmp WhichMenu,1
+		cmp WhichMenu,1	;模式选择
 		je EnterInMode
-		cmp WhichMenu,3
+		cmp WhichMenu,3	;结束界面
 		je EnterInResult
-		
-		jmp EnterInMenuReturn
+		jmp EnterToEndGame;意外情况结束游戏
 
+		;第二层分支
+		;下面的EnterInXX都是在XX界面进行跳转分支判断
+
+		;0号界面转移（初始界面）
 	EnterInMain:
 		cmp SelectMenu,0
-		je EnterToMode
-		jmp EnterToEndGame
+		je EnterToMode;0号选项，对应选择模式
+		cmp SelectMenu,1
+		je EnterToEndGame;否则就是1号选项，对应退出游戏
+		jmp EnterToEndGame;选到了其他选项暂定退出，后续可以考虑加继续游戏的分支
 
+		;1号界面转移（模式选择）
 	EnterInMode:
-		cmp SelectMenu,4
+		cmp SelectMenu,4;选项4，返回上层
 		je EnterToMain
-		mov eax,SelectMenu
-		and eax,1
-		mov GameMode,eax
-		mov eax,SelectMenu
-		sar eax,1
-		mov IsDoublePlayer,eax
-		mov WhichMenu,2
-		call ResetField
+		;剩下的0123选项都是进入游戏，只不过游戏模式不同
+		jmp EnterToGame ;转移到游戏界面，在转换过程中要对GameMode和IsDoublePlayer进行赋值，赋值后统一切换到界面2
 		jmp EnterInMenuReturn
 
+		;3号界面转移（结算界面）
 	EnterInResult:
 		cmp SelectMenu,0
-		je EnterToMain
-		jmp EnterToEndGame
-		
+		je EnterToMain	;0对应返回主界面
+		jmp EnterToEndGame	;1对应退出游戏
+
+		;以下的EnterToXX都是要通过Enter切换到XX界面
+
+		;转移到0：初始界面
 	EnterToMain:
 		mov WhichMenu,0
 		mov SelectMenu,0
 		jmp EnterInMenuReturn
 	
+		;转移到1：模式选择
 	EnterToMode:
 		mov WhichMenu,1
 		jmp EnterInMenuReturn
-	
+
+		;转移到2：游戏界面
+		;转移前进行模式赋值
+	EnterToGame:
+		mov eax,SelectMenu
+		and eax,1;取SelectMenu最后一位
+		mov GameMode,eax;0，2变成0，对应闯关模式，1,3变成1，对应挑战模式
+		mov eax,SelectMenu
+		sar eax,1;算数右移，00b和01b都会变成00b，对应单人模式,10b和11b都会变成11b，对应双人模式
+		mov IsDoublePlayer,eax	
+		mov WhichMenu,2
+		call ResetField;游戏初始化？TODO
+		jmp EnterInMenuReturn
+
+		;退出游戏
 	EnterToEndGame:
 		push 0
 		call PostQuitMessage
@@ -932,16 +954,12 @@ EnterInMenu:
 		pop eax
 		ret
 
+;esc键响应
 EscapeInMenu:
-
+		;按ESC回退到初始界面，可以在初始界面再加一个继续游戏（只要保证其他数据不被修改即可）
 		mov SelectMenu,0
 		mov WhichMenu,0
-		cmp WhichMenu,2
-		jne EscapeInMenuReturn
-		mov WhichMenu,1
-	EscapeInMenuReturn:
 		ret
-
 
 
 ;game units	
