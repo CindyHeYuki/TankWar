@@ -262,25 +262,32 @@ WinProc:
 
 		push ebp
 		mov ebp,esp
-		
-		mov eax,[ebp+12]
-		
-		cmp eax,WM_KEYDOWN;光标向下
+		;参数列表：
+		;ebp+8：HWND hWnd,窗口句柄，一般没啥用
+		;ebp+12：UINT message, 事件类型，比如按下键盘，移动鼠标
+		;ebp+16：WPARAM wParam,事件具体信息，比如键盘对应wParam：
+			;38上 40下 37左 39右 
+			;32space 13enter 27esc
+			;65a 68d 83s 87w
+		;LPARAM lParam，暂时不用
+		mov eax,[ebp+12];
+		;分支结构，根据事件类型转到不同分支
+		cmp eax,WM_KEYDOWN;按下键盘，将对应的Hold变量赋1，且进行对应操作
 		je KeyDownMessage
-		cmp eax,WM_KEYUP;光标向上
+		cmp eax,WM_KEYUP;松开键盘，将对应的Hold变量赋0
 		je KeyUpMessage
-		cmp eax,WM_CREATE
+		cmp eax,WM_CREATE;初始化？
 		je CreateWindowMessage
-		cmp eax,WM_CLOSE
+		cmp eax,WM_CLOSE;关闭窗口,销毁计时器
 		je CloseWindowMessage
-		cmp eax,WM_PAINT
+		cmp eax,WM_PAINT;刷新窗口
 		je PaintMessage
-		cmp eax,WM_TIMER
+		cmp eax,WM_TIMER;计时器事件，每隔一段时间重新绘制窗口
 		je TimerMessage
 		
-		jmp OtherMessage
+		jmp OtherMessage;交由默认回调函数处理
 	
-	KeyDownMessage:
+	KeyDownMessage:		;下面的各个分支对应上下左右wasd等各种键
 		mov eax,[ebp+16]
 
 		cmp eax,38
@@ -334,7 +341,7 @@ WinProc:
 		
 		jmp WinProcExit
 		
-	KeyUpMessage:
+	KeyUpMessage:		;下面的各个分支对应上下左右wasd等各种键
 		mov eax,[ebp+16]
 
 		cmp eax,38
@@ -525,7 +532,7 @@ WinProc:
 	WinProcExit:
 		mov esp,ebp
 		pop ebp
-		ret 16
+		ret 16	;清理4个参数
 		
 DrawUI:
 		cmp WhichMenu,0
