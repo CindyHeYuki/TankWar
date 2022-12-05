@@ -8,15 +8,15 @@
 .model flat, STDCALL
 
 
-INCLUDE C:\masm32\include\GraphWin.inc
+INCLUDE	..\support\GraphWin.inc
 INCLUDE gdi32.inc
 INCLUDE msimg32.inc
 INCLUDELIB gdi32.lib
 INCLUDELIB msimg32.lib
-INCLUDELIB C:\masm32\lib\irvine32.lib
+INCLUDELIB ..\support\irvine32.lib
 INCLUDELIB kernel32.lib
 INCLUDELIB user32.lib
-INCLUDE C:\masm32\include\bhw.inc
+INCLUDE ..\support\bhw.inc
 INCLUDELIB msvcrt.lib
 
 
