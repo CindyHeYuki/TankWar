@@ -8,39 +8,41 @@
 .model flat, STDCALL
 
 
-INCLUDE ..\support\GraphWin.inc
-INCLUDE ..\support\gdi32.inc
+INCLUDE C:\masm32\include\GraphWin.inc
+INCLUDE gdi32.inc
 INCLUDE msimg32.inc
 INCLUDELIB gdi32.lib
 INCLUDELIB msimg32.lib
 INCLUDELIB C:\masm32\lib\irvine32.lib
 INCLUDELIB kernel32.lib
 INCLUDELIB user32.lib
-INCLUDE ..\support\bhw.inc
+INCLUDE C:\masm32\include\bhw.inc
+INCLUDELIB msvcrt.lib
 
 
-
+printf	PROTO	C :ptr sbyte,:VARARG
 WriteDec PROTO
 Crlf PROTO
 
 .data
 
+szMsg	BYTE "%d",0ah,0
 WindowName BYTE "Tank", 0
 className BYTE "Tank", 0
 imgName BYTE "djb.bmp", 0
 
 
-;创建一个窗口，基于窗口类来实现，必须确定处理窗口的窗口过程(回调函数)。
+;创建一个窗口，基于窗口类来实现，必须确定处理窗口的窗口过程(回调函数)。其他参数初始为NULL，后续会在WinMain主函数中填充
 MainWin WNDCLASS <NULL, WinProc, NULL, NULL, NULL, NULL, NULL, COLOR_WINDOW, NULL, className>
 
-msg MSGStruct <>
+msg MSGStruct <>	;消息结构，用户存放获取的message
 winRect RECT <>
 hMainWnd DWORD ?	;主窗口的句柄
 hInstance DWORD ?
 
 hbitmap DWORD ?		;图片的句柄
-hdcMem DWORD ?		;和下面一样似乎都是hdc句柄...
-hdcPic DWORD ?		;
+hdcMem DWORD ?		;hdc句柄，使用频率高
+hdcPic DWORD ?		;hdc句柄，很少使用
 hdc DWORD ?
 holdbr DWORD ?
 holdft DWORD ?
@@ -199,35 +201,44 @@ RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 RoundEnemy	DWORD 999,999,999,8,0,0,8,0,0,8,0,2,9,3,4,8,5,5
 RoundSpeed	DWORD 1,60,60,60,50,50,1
 
+;本项目全部使用经典的STDCALL写法，先push参数，之后call调用，栈由被调用过程清理
 .code
 
-;应该是一个从窗口开始直到结束的过程
-
+;窗口主函数，是程序的入口（Win32程序入口不再是main）
 WinMain:
+		;整体过程：
+		;0. 
+		;1. 实例化（程序开始已做）WNDCLASS类并填充
+		;2. 将WNDCLASS类注册到windows系统中，此后可以通过这个类的className字段绑定这个窗口
+		;3. 创建运行窗口（注册并不等于运行），使用已注册窗口的className字段绑定
+		;4. 初始化+显示窗口
+		;5. 后台运行窗口的死循环消息队列，不断将消息（可以理解为用户的各种操作）发送给WinProc函数进行响应
+
+		;1. 填充WNDCLASS类
 		call Randomize	;why?
 
-;先把好多东西都压入栈，后面怎么操作呢？ 应该是直接从栈中取值，因为并没有看到寄存器传值的过程
 		push NULL
-		;参数什么时候传进去的？ 可能在主函数中有
+
 		call GetModuleHandle	;返回模块的句柄
 		mov hInstance,eax		;hInstance中存有句柄
 		
-		push 999				;不太懂这里的999的含义
+		push 999				;999代表资源里的tank.ico
 		push hInstance
 		call LoadIcon			;加载图标
-		mov MainWin.hIcon,eax	;把返回的图标给mainwin???
+		mov MainWin.hIcon,eax	;填充MainWin的图标信息
 
 		push IDC_ARROW			;标准箭头常量，似乎是那个选择关卡的鼠标键
 		push NULL
 		call LoadCursor
-		mov MainWin.hCursor,eax
-		
-		push offset MainWin		;不太清楚这里压入栈的含义
-		call RegisterClass		;注册窗口类 返回一个ATOM
+		mov MainWin.hCursor,eax	;填充MainWin的游标信息？游标干啥的？TODO
+
+		;2. 注册窗口
+		push offset MainWin	
+		call RegisterClass		;注册窗口类 返回一个ATOM，表示注册状态
 		cmp eax,0				;是否注册成功
 		je ExitProgram
 		
-		;可能是创建窗口的参数说明？但怎么使用呢，都在栈里面
+		;3. 激活窗口，通过className绑定已注册窗口
 		push NULL
 		push hInstance		;IpClassName 类名
 		push NULL			
@@ -245,30 +256,29 @@ WinMain:
 		je ExitProgram		;创建失败则退出程序
 		mov hMainWnd,eax	
 		
+		;4. 初始化并显示
 		push SW_SHOW		;控件的状态 显示窗口
 		push hMainWnd
 		call ShowWindow
 		
 		push hMainWnd
 		call UpdateWindow
-;这之前是窗口建立的准备工作
-;消息传递--底层 键位
-	MessageLoop:	;获取信息，开始游戏还是退出游戏
-	;消息循环，从消息队列中获取信息
-	;为什么要写三个push offset msg???
+
+		;5. 后台while死循环，不断获取本应用窗口上的Message，经过简单预处理后发送给WinProc回调函数处理
+	MessageLoop:
 		push NULL
 		push NULL
 		push NULL
 		push offset msg
-		call GetMessage
+		call GetMessage	;获取消息，填充msg结构：GetMessage(&msg, NULL, 0, 0)
 		
 		cmp eax,0
-		je ExitProgram
+		je ExitProgram	;如果获取消息失败就退出
 		
 		push offset msg
-		call TranslateMessage	;获取虚拟键消息
+		call TranslateMessage	;调整msg内消息，转换成更好的格式
 		push offset msg
-		call DispatchMessage	;将消息传给操作系统
+		call DispatchMessage	;将消息传给WinProc回调函数，这个Dispatch函数其实是将4个参数push进栈后，调用WinProc函数
 		;是否过滤消息？
 
 		jmp MessageLoop
@@ -277,85 +287,98 @@ WinMain:
 		push 0
 		call ExitProcess
 
-;窗口的过程
+;回调函数，用于响应窗口上产生的一切事件，比如鼠标，键盘等。
 WinProc:
+		;函数原型：LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+		;参数列表：
+		;ebp+8：HWND hWnd,窗口句柄
+		;ebp+12：UINT message, 事件类型，比如按下键盘，移动鼠标
+		;ebp+16：WPARAM wParam,事件具体信息，比如键盘：
+			;38上 40下 37左 39右 
+			;32space 13enter 27esc
+			;65a 68d 83s 87w
+		;ebp+24：LPARAM lParam
 
 		push ebp		;被调用者保存寄存器
 		mov ebp,esp		;栈顶指针%esp
-		
-		mov eax,[ebp+12];第三个？？？
-		
-;
-		cmp eax,WM_KEYDOWN	;按下按键（上下左右和wasd的操作方式）
+
+		;第一级分支结构，根据基本事件类型转到不同分支
+		mov eax,[ebp+12]	;取message参数
+
+		cmp eax,WM_KEYDOWN	;按下键盘，将对应的Hold变量赋1，且进行对应操作
 		je KeyDownMessage
-		cmp eax,WM_KEYUP	;按键按下和松开好像是分开的？？？不太理解
+		cmp eax,WM_KEYUP	;松开键盘，将对应的Hold变量赋0
 		je KeyUpMessage
-		cmp eax,WM_CREATE	;create what???
+		cmp eax,WM_CREATE	;在程序运行之初，初始化窗口，只会调用一次
 		je CreateWindowMessage
-		cmp eax,WM_CLOSE
+		cmp eax,WM_CLOSE	;点击窗口右上角×号，关闭窗口，退出程序，同时销毁后台的计时器
 		je CloseWindowMessage
-		cmp eax,WM_PAINT	;系统检查窗口中是否有无效区域，如果有会产生一个WM_PAINT消息
+		cmp eax,WM_PAINT	;任何对窗口的更改，都会产生一个WM_PAINT消息（包括定时器也会触发WM_PAINT）
 		je PaintMessage
-		cmp eax,WM_TIMER
+		cmp eax,WM_TIMER	;计时器事件，每隔一段时间重新绘制窗口（基本和PaintMessage交替出现）
 		je TimerMessage
 		
-		jmp OtherMessage
+		jmp OtherMessage	;交由默认回调函数处理
 	
+		;第二级分支，通过判断具体事件类型转到不同分支
+		;按键下压
+		;下面的各个分支对应上下左右wasd等各种键，空格和enter执行相同功能（跳转的label相同）
+		;注意，所有按键都会影响Hold变量，但是up，down，esc，space和enter会调用额外的处理函数，比如界面跳转，发射子弹等等
 	KeyDownMessage:
-	;可以在这里修改按键对应的功能
-	;空格和enter代表发射按钮
-		mov eax,[ebp+16]
+		mov eax,[ebp+16];取wParam参数
+
 		cmp eax,38
 		jne @nup1
-		call UpInMenu
+		call UpInMenu;上
 		mov UpKeyHold,1
 	@nup1:
 		cmp eax,40
 		jne @ndown1
-		call DownInMenu
+		call DownInMenu;下
 		mov DownKeyHold,1
 	@ndown1:
 		cmp eax,37
 		jne @nleft1
-		mov LeftKeyHold,1
+		mov LeftKeyHold,1;左
 	@nleft1:
 		cmp eax,39
 		jne @nright1
-		mov RightKeyHold,1
+		mov RightKeyHold,1;右
 	@nright1:
 		cmp eax,32
 		jne @nspace1
 		mov SpaceKeyHold,1
-		call EnterInMenu
+		call EnterInMenu;空格，调用函数
 	@nspace1:
 		cmp eax,13
 		jne @nenter1
 		mov EnterKeyHold,1
-		call EnterInMenu
+		call EnterInMenu;回车，调用函数
 	@nenter1:
 		cmp eax,27
 		jne @nescape1
-		call EscapeInMenu
+		call EscapeInMenu;esc键，调用函数
 	@nescape1:
 		cmp eax,65
 		jne @na1
-		mov AKeyHold,1
+		mov AKeyHold,1;A
 	@na1:
 		cmp eax,68
 		jne @nd1
-		mov DKeyHold,1
+		mov DKeyHold,1;D
 	@nd1:
 		cmp eax,83
 		jne @ns1
-		mov SKeyHold,1
+		mov SKeyHold,1;S
 	@ns1:
 		cmp eax,87
 		jne @nw1
-		mov WKeyHold,1
+		mov WKeyHold,1;W
 	@nw1:
+		jmp WinProcExit;不需要处理的键
 		
-		jmp WinProcExit
-		
+		;按键释放
+		;结构同按键下压
 	KeyUpMessage:
 		mov eax,[ebp+16]
 
@@ -399,52 +422,54 @@ WinProc:
 		jne @nw2
 		mov WKeyHold,0
 	@nw2:
-	
 		jmp WinProcExit
-			
+
+		;在程序运行之初初始化窗口信息，只会调用一次
+		;初始化只是给你整了个背景，把bitmap加载到内存中
+		;并不涉及到坦克，地图之类的绘制，所有的绘制都由DrawUI实现
 	CreateWindowMessage:
-	;create what?
-		mov eax,[ebp+8]		;why 8? 跳转到新的窗口？
+		;获取窗口句柄，初始化hMainWnd（其实在此之前已经初始化过了，或许这两个有所不同）
+		mov eax,[ebp+8]
 		mov hMainWnd,eax
-	
+		invoke printf,offset szMsg,eax
+
 		push NULL
-		push 30
+		push 30	;超时值，每30个时间单位发送一个信息，可以理解为刷新间隔
 		push 1
 		push hMainWnd
-		call SetTimer
+		call SetTimer	;为当前窗口加一个计时器，计时器会不断发出计时器事件
 	
 		push hMainWnd
-		call GetDC			;返回检索区域的句柄
-		;该函数检索一指定窗口的客户区域或整个屏幕的显示设备上下文环境的句柄
-		mov hdc,eax				;现有设备上下文环境的句柄
+		call GetDC			;获取环境上下文句柄，该函数检索一指定窗口的客户区域或整个屏幕的显示设备上下文环境的句柄
+		mov hdc,eax				;返回当前窗口工作区DC句柄
 		
 		push eax
-		call CreateCompatibleDC	;该函数创建一个与指定设备兼容的内存设备上下文环境（DC）
-		mov hdcPic,eax
+		call CreateCompatibleDC	;环境兼容化：该函数创建一个与指定设备兼容的内存设备上下文环境（DC）
+		mov hdcPic,eax		;兼容的内存DC句柄（相当于生成个画布）
 		
 		push 0
 		push 0
 		push 0
-		push 0
+		push 0	;type=位图
 		push 1001
 		push hInstance
-		call LoadImageA			;加载什么呢？对象在哪存储的
-		mov hbitmap,eax			;返回句柄
+		call LoadImageA			;加载1001号资源（对应目录下的bmp资源位图）
+		mov hbitmap,eax			;返回资源图句柄
 		
 		push hbitmap
 		push hdcPic
-		call SelectObject		;把一个对象(位图、画笔、画刷等)选入指定的设备描述表。
+		call SelectObject		;把位图放到DC中
 
 		push hdc
 		call CreateCompatibleDC	;为什么这里还要创建一次？？？
-		mov hdcMem,eax
+		mov hdcMem,eax	;创建第二个兼容DC
 
-		push 480	;480->640
+		push 480	;480->100 可以大，但是不可以小
 		push 640
 		push hdc
-		call CreateCompatibleBitmap	
-		;该函数创建与指定的设备环境相关的设备兼容的位图
-		;指定高度、宽度、设备环境句柄(按照上面入栈的顺序来看)
+		call CreateCompatibleBitmap	;该函数创建与指定的设备环境相关的设备兼容的位图
+									;指定高度、宽度、设备环境句柄(按照上面入栈的顺序来看)
+		
 		mov hbitmap,eax	;返回创造好的位图的句柄
 		
 		push hbitmap	;把位图句柄				hdc
@@ -462,20 +487,23 @@ WinProc:
 		push hdc
 		push hMainWnd
 		call ReleaseDC		;释放由调用GetDC或GetWindowDC函数获取的指定设备场景。
-		;以上的内容算是把一个游戏界面做好了
 		
 		jmp WinProcExit
-		
-	CloseWindowMessage:;关掉窗口？虽然不太清楚按下什么键才能实现这个功能
+
+		;关闭窗口事件
+	CloseWindowMessage:
+		;invoke printf,offset szMsg,2
 		push 0
-		call PostQuitMessage
+		call PostQuitMessage	;给进程发送退出指令
 		push 1
 		push hMainWnd
-		call KillTimer
+		call KillTimer	;关闭计时器
 		jmp WinProcExit
 		
+		;绘制所有的UI
+		;核心调用：DrawUI
 	PaintMessage:
-	;绘制地图？？？我感觉是绘制游戏的边框
+		invoke printf,offset szMsg,1
 		push offset ps	;绘制窗口的信息都有
 		push hMainWnd
 		call BeginPaint
@@ -497,14 +525,14 @@ WinProc:
 		call SelectObject
 		mov holdft,eax
 		
-		push 1000		;480->1000
+		push 480		;480->1000
 		push 640
 		push 0
 		push 0
 		push hdcMem
 		call Rectangle
 
-		call DrawUI
+		call DrawUI	;调用核心的UI绘制函数，在给定背景下放置各种图片资源。所有的绘制全部由DrawUI实现。
 		
 		push holdbr
 		push hdcMem
@@ -531,11 +559,13 @@ WinProc:
 		
 		jmp WinProcExit
 	
+		;计时器事件
+		;核心调用：TimerTick
 	TimerMessage:
-	
+		invoke printf,offset szMsg,2
 		call TimerTick	;游戏开始了？？ TimerTick里面是游戏运行逻辑
 
-		push 1			;并不是指定的参数之一啊？？？1是个是啥。
+		push 1
 		push NULL
 		push NULL
 		push hMainWnd
@@ -543,13 +573,15 @@ WinProc:
 
 		jmp WinProcExit
 		
-	OtherMessage:
+		;默认回调函数
+	OtherMessage:	
 		push [ebp+20]
 		push [ebp+16]
 		push [ebp+12]
 		push [ebp+8]
 		call DefWindowProc
 		
+		;退出WinProc
 	WinProcExit:
 		mov esp,ebp
 		pop ebp
@@ -727,7 +759,7 @@ DrawHalfSpirit:
 		
 		mov ecx,[ebp+12]
 
-		push 0ff00h
+		push 0FF00h
 		push [DrawHalfSpiritMask+16+ecx*4]
 		push [DrawHalfSpiritMask+ecx*4]
 		push eax
@@ -762,7 +794,7 @@ DrawSpirit:
 		sal eax,5
 		sal ebx,5
 
-		push 0ff00h			;透明色
+		push 0FF00h			;透明色
 		push 32	;32->16源高度 似乎变长了？？
 		push 32	;32->16源宽度
 		push eax

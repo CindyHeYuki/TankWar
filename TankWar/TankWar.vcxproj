@@ -84,6 +84,7 @@
     </Link>
     <MASM>
       <IncludePaths>C:\masm32\include;%(IncludePaths)</IncludePaths>
+      <WarningLevel>3</WarningLevel>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,6 +100,7 @@
     </Link>
     <MASM>
       <IncludePaths>C:\masm32\include;%(IncludePaths)</IncludePaths>
+      <WarningLevel>3</WarningLevel>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,6 +120,7 @@
     </Link>
     <MASM>
       <IncludePaths>C:\masm32\include;%(IncludePaths)</IncludePaths>
+      <WarningLevel>3</WarningLevel>
     </MASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,6 +140,7 @@
     </Link>
     <MASM>
       <IncludePaths>C:\masm32\include;%(IncludePaths)</IncludePaths>
+      <WarningLevel>3</WarningLevel>
     </MASM>
   </ItemDefinitionGroup>
   <ItemGroup>
