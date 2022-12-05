@@ -8,15 +8,15 @@
 .model flat, STDCALL
 
 
-INCLUDE C:\masm32\include\GraphWin.inc
-INCLUDE gdi32.inc
+INCLUDE ..\support\GraphWin.inc
+INCLUDE ..\support\gdi32.inc
 INCLUDE msimg32.inc
 INCLUDELIB gdi32.lib
 INCLUDELIB msimg32.lib
 INCLUDELIB C:\masm32\lib\irvine32.lib
 INCLUDELIB kernel32.lib
 INCLUDELIB user32.lib
-INCLUDE C:\masm32\include\bhw.inc
+INCLUDE ..\support\bhw.inc
 
 
 
@@ -727,7 +727,7 @@ DrawHalfSpirit:
 		
 		mov ecx,[ebp+12]
 
-		push 0FF00h
+		push 0ff00h
 		push [DrawHalfSpiritMask+16+ecx*4]
 		push [DrawHalfSpiritMask+ecx*4]
 		push eax
@@ -762,7 +762,7 @@ DrawSpirit:
 		sal eax,5
 		sal ebx,5
 
-		push 0FF00h			;透明色
+		push 0ff00h			;透明色
 		push 32	;32->16源高度 似乎变长了？？
 		push 32	;32->16源宽度
 		push eax
