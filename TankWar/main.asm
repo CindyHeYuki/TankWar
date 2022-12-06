@@ -1,13 +1,13 @@
-;½çÃæÊµÏÖ
-;ÏûÏ¢´«µİÓë¿ØÖÆ£º´ÓÓ²¼şµ½²Ù×÷ÏµÍ³£¬Ñ¹Õ»£¬½øĞĞÒ»Ğ©¿ØÖÆ£¨ÓëÍâ½ç½øĞĞĞÅÏ¢½»Á÷£©
+;ç•Œé¢å®ç°
+;æ¶ˆæ¯ä¼ é€’ä¸æ§åˆ¶ï¼šä»ç¡¬ä»¶åˆ°æ“ä½œç³»ç»Ÿï¼Œå‹æ ˆï¼Œè¿›è¡Œä¸€äº›æ§åˆ¶ï¼ˆä¸å¤–ç•Œè¿›è¡Œä¿¡æ¯äº¤æµï¼‰
 
-;ÓÎÏ·Âß¼­
+;æ¸¸æˆé€»è¾‘
 
 
 .386
 .model flat, STDCALL
 
-;Ê¹ÓÃÏà¶ÔÂ·¾¶µ¼ÈësupportÎÄ¼ş¼ĞÖĞµÄÈı¸ö¿â
+;ä½¿ç”¨ç›¸å¯¹è·¯å¾„å¯¼å…¥supportæ–‡ä»¶å¤¹ä¸­çš„ä¸‰ä¸ªåº“
 INCLUDE	..\support\GraphWin.inc
 INCLUDE gdi32.inc
 INCLUDE msimg32.inc
@@ -32,17 +32,17 @@ className BYTE "Tank", 0
 imgName BYTE "djb.bmp", 0
 
 
-;´´½¨Ò»¸ö´°¿Ú£¬»ùÓÚ´°¿ÚÀàÀ´ÊµÏÖ£¬±ØĞëÈ·¶¨´¦Àí´°¿ÚµÄ´°¿Ú¹ı³Ì(»Øµ÷º¯Êı)¡£ÆäËû²ÎÊı³õÊ¼ÎªNULL£¬ºóĞø»áÔÚWinMainÖ÷º¯ÊıÖĞÌî³ä
+;åˆ›å»ºä¸€ä¸ªçª—å£ï¼ŒåŸºäºçª—å£ç±»æ¥å®ç°ï¼Œå¿…é¡»ç¡®å®šå¤„ç†çª—å£çš„çª—å£è¿‡ç¨‹(å›è°ƒå‡½æ•°)ã€‚å…¶ä»–å‚æ•°åˆå§‹ä¸ºNULLï¼Œåç»­ä¼šåœ¨WinMainä¸»å‡½æ•°ä¸­å¡«å……
 MainWin WNDCLASS <NULL, WinProc, NULL, NULL, NULL, NULL, NULL, COLOR_WINDOW, NULL, className>
 
-msg MSGStruct <>	;ÏûÏ¢½á¹¹£¬ÓÃ»§´æ·Å»ñÈ¡µÄmessage
+msg MSGStruct <>	;æ¶ˆæ¯ç»“æ„ï¼Œç”¨æˆ·å­˜æ”¾è·å–çš„message
 winRect RECT <>
-hMainWnd DWORD ?	;Ö÷´°¿ÚµÄ¾ä±ú
+hMainWnd DWORD ?	;ä¸»çª—å£çš„å¥æŸ„
 hInstance DWORD ?
 
-hbitmap DWORD ?		;Í¼Æ¬µÄ¾ä±ú
-hdcMem DWORD ?		;hdc¾ä±ú£¬Ê¹ÓÃÆµÂÊ¸ß
-hdcPic DWORD ?		;hdc¾ä±ú£¬ºÜÉÙÊ¹ÓÃ
+hbitmap DWORD ?		;å›¾ç‰‡çš„å¥æŸ„
+hdcMem DWORD ?		;hdcå¥æŸ„ï¼Œä½¿ç”¨é¢‘ç‡é«˜
+hdcPic DWORD ?		;hdcå¥æŸ„ï¼Œå¾ˆå°‘ä½¿ç”¨
 hdc DWORD ?
 holdbr DWORD ?
 holdft DWORD ?
@@ -59,14 +59,14 @@ DrawHalfSpiritMask DWORD 32, 32, 16, 16, 16, 16, 32, 32, 0, 0, 0, 16, 0, 16, 0, 
 ScoreText BYTE "000000", 0
 RandomPlace DWORD 64, 224, 384
 
-WaterSpirit DWORD ? ; Ë®µÄÍ¼Æ¬£¬ĞèÒªx / 8 + 3
-WhichMenu DWORD 0; ÄÄ¸ö½çÃæ£¬0±íÊ¾¿ªÊ¼£¬1±íÊ¾Ñ¡ÔñÓÎÏ·Ä£Ê½£¬2±íÊ¾ÕıÔÚÓÎÏ·£¬3±íÊ¾ÓÎÏ·½áÊø
-ButtonNumber DWORD 2, 5, 0, 2; Ã¿¸ö½çÃæÏÂµÄÑ¡ÏîÊı
-SelectMenu DWORD 0; ÕıÔÚÑ¡ÔñµÄ²Ëµ¥Ïî
-GameMode DWORD 0; ÓÎÏ·Ä£Ê½ 0Îª´³¹ØÄ£Ê½£¬1ÎªÌôÕ½Ä£Ê½
-IsDoublePlayer DWORD 0; ÓÎÏ·Ä£Ê½£¬00ÊÇµ¥ÈËÓÎÏ·£¬11ÊÇË«ÈËÓÎÏ·
+WaterSpirit DWORD ? ; æ°´çš„å›¾ç‰‡ï¼Œéœ€è¦x / 8 + 3
+WhichMenu DWORD 0; å“ªä¸ªç•Œé¢ï¼Œ0è¡¨ç¤ºå¼€å§‹ï¼Œ1è¡¨ç¤ºé€‰æ‹©æ¸¸æˆæ¨¡å¼ï¼Œ2è¡¨ç¤ºæ­£åœ¨æ¸¸æˆï¼Œ3è¡¨ç¤ºæ¸¸æˆç»“æŸ
+ButtonNumber DWORD 2, 5, 0, 2; æ¯ä¸ªç•Œé¢ä¸‹çš„é€‰é¡¹æ•°
+SelectMenu DWORD 0; æ­£åœ¨é€‰æ‹©çš„èœå•é¡¹
+GameMode DWORD 0; æ¸¸æˆæ¨¡å¼ 0ä¸ºé—¯å…³æ¨¡å¼ï¼Œ1ä¸ºæŒ‘æˆ˜æ¨¡å¼
+IsDoublePlayer DWORD 0; æ¸¸æˆæ¨¡å¼ï¼Œ00æ˜¯å•äººæ¸¸æˆï¼Œ11æ˜¯åŒäººæ¸¸æˆ
 
-;°´¼ü²Ù×÷²¿·Ö£¬°´ÏÂ¾Í»á±ä³É1£¬·ñÔò¾ÍÊÇ0
+;æŒ‰é”®æ“ä½œéƒ¨åˆ†ï¼ŒæŒ‰ä¸‹å°±ä¼šå˜æˆ1ï¼Œå¦åˆ™å°±æ˜¯0
 UpKeyHold DWORD 0
 DownKeyHold DWORD 0
 LeftKeyHold DWORD 0
@@ -78,9 +78,9 @@ DKeyHold DWORD 0
 SpaceKeyHold DWORD 0
 EnterKeyHold DWORD 0
 
-; 0=ÍÁµØ,1=Ë®,2=Ê÷,3=Ç½,4~7=¸÷ÖÖÇ½(ÉÏÏÂ×óÓÒ),8=ÀÏ¼Ò,11=Ìú,12~15=¸÷ÖÖÌú
+; 0=åœŸåœ°,1=æ°´,2=æ ‘,3=å¢™,4~7=å„ç§å¢™(ä¸Šä¸‹å·¦å³),8=è€å®¶,11=é“,12~15=å„ç§é“
 Map			DWORD 225 DUP(?)
-; ÀàĞÍ(0=²»´æÔÚ,1=Íæ¼ÒÌ¹¿Ë,2=Î´Ê¹ÓÃ,3=ÆÕÍ¨,4=Ç¿»¯,5=¿ìËÙ),X,Y,·½Ïò,×Óµ¯ÀàĞÍ(0=²»´æÔÚ,1=´æÔÚ,2~9=±¬Õ¨),×Óµ¯X,Y,·½Ïò
+; ç±»å‹(0=ä¸å­˜åœ¨,1=ç©å®¶å¦å…‹,2=æœªä½¿ç”¨,3=æ™®é€š,4=å¼ºåŒ–,5=å¿«é€Ÿ),X,Y,æ–¹å‘,å­å¼¹ç±»å‹(0=ä¸å­˜åœ¨,1=å­˜åœ¨,2~9=çˆ†ç‚¸),å­å¼¹X,Y,æ–¹å‘
 YourTank	DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
 EnemyTank	DWORD 0,0,0,0,0,0,0,0
@@ -100,7 +100,7 @@ Round		DWORD 0
 WaitingTime	DWORD -1
 YouDie		DWORD 0
 
-			; Round 0 (ÌôÕ½Ä£Ê½)
+			; Round 0 (æŒ‘æˆ˜æ¨¡å¼)
 RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 			DWORD  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
 			DWORD  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
@@ -197,89 +197,89 @@ RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 			DWORD  0, 0, 3, 1, 0, 0, 3, 3, 3, 0, 0, 1, 3, 0, 0
 			DWORD  0, 0,11, 1, 0, 0, 3, 8, 3, 0, 0, 1,11, 0, 0
 
-;²»Ì«È·¶¨ÕâÀïµÄenemyµÄº¬Òå
+;ä¸å¤ªç¡®å®šè¿™é‡Œçš„enemyçš„å«ä¹‰
 RoundEnemy	DWORD 999,999,999,8,0,0,8,0,0,8,0,2,9,3,4,8,5,5
 RoundSpeed	DWORD 1,60,60,60,50,50,1
 
-;±¾ÏîÄ¿È«²¿Ê¹ÓÃ¾­µäµÄSTDCALLĞ´·¨£¬ÏÈpush²ÎÊı£¬Ö®ºócallµ÷ÓÃ£¬Õ»ÓÉ±»µ÷ÓÃ¹ı³ÌÇåÀí
+;æœ¬é¡¹ç›®å…¨éƒ¨ä½¿ç”¨ç»å…¸çš„STDCALLå†™æ³•ï¼Œå…ˆpushå‚æ•°ï¼Œä¹‹åcallè°ƒç”¨ï¼Œæ ˆç”±è¢«è°ƒç”¨è¿‡ç¨‹æ¸…ç†
 .code
 
-;´°¿ÚÖ÷º¯Êı£¬ÊÇ³ÌĞòµÄÈë¿Ú£¨Win32³ÌĞòÈë¿Ú²»ÔÙÊÇmain£©
+;çª—å£ä¸»å‡½æ•°ï¼Œæ˜¯ç¨‹åºçš„å…¥å£ï¼ˆWin32ç¨‹åºå…¥å£ä¸å†æ˜¯mainï¼‰
 WinMain:
-		;ÕûÌå¹ı³Ì£º
+		;æ•´ä½“è¿‡ç¨‹ï¼š
 		;0. 
-		;1. ÊµÀı»¯£¨³ÌĞò¿ªÊ¼ÒÑ×ö£©WNDCLASSÀà²¢Ìî³ä
-		;2. ½«WNDCLASSÀà×¢²áµ½windowsÏµÍ³ÖĞ£¬´Ëºó¿ÉÒÔÍ¨¹ıÕâ¸öÀàµÄclassName×Ö¶Î°ó¶¨Õâ¸ö´°¿Ú
-		;3. ´´½¨ÔËĞĞ´°¿Ú£¨×¢²á²¢²»µÈÓÚÔËĞĞ£©£¬Ê¹ÓÃÒÑ×¢²á´°¿ÚµÄclassName×Ö¶Î°ó¶¨
-		;4. ³õÊ¼»¯+ÏÔÊ¾´°¿Ú
-		;5. ºóÌ¨ÔËĞĞ´°¿ÚµÄËÀÑ­»·ÏûÏ¢¶ÓÁĞ£¬²»¶Ï½«ÏûÏ¢£¨¿ÉÒÔÀí½âÎªÓÃ»§µÄ¸÷ÖÖ²Ù×÷£©·¢ËÍ¸øWinProcº¯Êı½øĞĞÏìÓ¦
+		;1. å®ä¾‹åŒ–ï¼ˆç¨‹åºå¼€å§‹å·²åšï¼‰WNDCLASSç±»å¹¶å¡«å……
+		;2. å°†WNDCLASSç±»æ³¨å†Œåˆ°windowsç³»ç»Ÿä¸­ï¼Œæ­¤åå¯ä»¥é€šè¿‡è¿™ä¸ªç±»çš„classNameå­—æ®µç»‘å®šè¿™ä¸ªçª—å£
+		;3. åˆ›å»ºè¿è¡Œçª—å£ï¼ˆæ³¨å†Œå¹¶ä¸ç­‰äºè¿è¡Œï¼‰ï¼Œä½¿ç”¨å·²æ³¨å†Œçª—å£çš„classNameå­—æ®µç»‘å®š
+		;4. åˆå§‹åŒ–+æ˜¾ç¤ºçª—å£
+		;5. åå°è¿è¡Œçª—å£çš„æ­»å¾ªç¯æ¶ˆæ¯é˜Ÿåˆ—ï¼Œä¸æ–­å°†æ¶ˆæ¯ï¼ˆå¯ä»¥ç†è§£ä¸ºç”¨æˆ·çš„å„ç§æ“ä½œï¼‰å‘é€ç»™WinProcå‡½æ•°è¿›è¡Œå“åº”
 
-		;1. Ìî³äWNDCLASSÀà
+		;1. å¡«å……WNDCLASSç±»
 		call Randomize	;why?
 
 		push NULL
 
-		call GetModuleHandle	;·µ»ØÄ£¿éµÄ¾ä±ú
-		mov hInstance,eax		;hInstanceÖĞ´æÓĞ¾ä±ú
+		call GetModuleHandle	;è¿”å›æ¨¡å—çš„å¥æŸ„
+		mov hInstance,eax		;hInstanceä¸­å­˜æœ‰å¥æŸ„
 		
-		push 999				;999´ú±í×ÊÔ´ÀïµÄtank.ico
+		push 999				;999ä»£è¡¨èµ„æºé‡Œçš„tank.ico
 		push hInstance
-		call LoadIcon			;¼ÓÔØÍ¼±ê
-		mov MainWin.hIcon,eax	;Ìî³äMainWinµÄÍ¼±êĞÅÏ¢
+		call LoadIcon			;åŠ è½½å›¾æ ‡
+		mov MainWin.hIcon,eax	;å¡«å……MainWinçš„å›¾æ ‡ä¿¡æ¯
 
-		push IDC_ARROW			;±ê×¼¼ıÍ·³£Á¿£¬ËÆºõÊÇÄÇ¸öÑ¡Ôñ¹Ø¿¨µÄÊó±ê¼ü
+		push IDC_ARROW			;æ ‡å‡†ç®­å¤´å¸¸é‡ï¼Œä¼¼ä¹æ˜¯é‚£ä¸ªé€‰æ‹©å…³å¡çš„é¼ æ ‡é”®
 		push NULL
 		call LoadCursor
-		mov MainWin.hCursor,eax	;Ìî³äMainWinµÄÓÎ±êĞÅÏ¢£¿ÓÎ±ê¸ÉÉ¶µÄ£¿TODO
+		mov MainWin.hCursor,eax	;å¡«å……MainWinçš„æ¸¸æ ‡ä¿¡æ¯ï¼Ÿæ¸¸æ ‡å¹²å•¥çš„ï¼ŸTODO
 
-		;2. ×¢²á´°¿Ú
+		;2. æ³¨å†Œçª—å£
 		push offset MainWin	
-		call RegisterClass		;×¢²á´°¿ÚÀà ·µ»ØÒ»¸öATOM£¬±íÊ¾×¢²á×´Ì¬
-		cmp eax,0				;ÊÇ·ñ×¢²á³É¹¦
+		call RegisterClass		;æ³¨å†Œçª—å£ç±» è¿”å›ä¸€ä¸ªATOMï¼Œè¡¨ç¤ºæ³¨å†ŒçŠ¶æ€
+		cmp eax,0				;æ˜¯å¦æ³¨å†ŒæˆåŠŸ
 		je ExitProgram
 		
-		;3. ¼¤»î´°¿Ú£¬Í¨¹ıclassName°ó¶¨ÒÑ×¢²á´°¿Ú
+		;3. æ¿€æ´»çª—å£ï¼Œé€šè¿‡classNameç»‘å®šå·²æ³¨å†Œçª—å£
 		push NULL
-		push hInstance		;IpClassName ÀàÃû
+		push hInstance		;IpClassName ç±»å
 		push NULL			
 		push NULL
 		push 510			;x	510->	600
 		push 650			;y	650->	1000
 		push CW_USEDEFAULT	;nWidth
-		push CW_USEDEFAULT	;nHeight ÒÔÉÏËÄ¸öÓÃÀ´Ö¸¶¨Î»ÖÃºÍ´óĞ¡
+		push CW_USEDEFAULT	;nHeight ä»¥ä¸Šå››ä¸ªç”¨æ¥æŒ‡å®šä½ç½®å’Œå¤§å°
 		push (WS_BORDER+WS_CAPTION+WS_SYSMENU)	;hWndParent ;MAIN_WINDOW_STYLE
-		push offset WindowName	;hMenu	²Ëµ¥µÄ¾ä±ú
-		push offset className	;hInstance	Òª½«Óë´°¿Ú¹ØÁªµÄÄ£¿éµÄÊµÀı¾ä±ú
+		push offset WindowName	;hMenu	èœå•çš„å¥æŸ„
+		push offset className	;hInstance	è¦å°†ä¸çª—å£å…³è”çš„æ¨¡å—çš„å®ä¾‹å¥æŸ„
 		push 0
-		call CreateWindowEx		;Ê¹ÓÃCreateWindowExÀ´´´½¨Ò»¸ö´°¿Ú£¬´ÓÕâÀï¿ªÊ¼ÔËĞĞ
+		call CreateWindowEx		;ä½¿ç”¨CreateWindowExæ¥åˆ›å»ºä¸€ä¸ªçª—å£ï¼Œä»è¿™é‡Œå¼€å§‹è¿è¡Œ
 		cmp eax,0
-		je ExitProgram		;´´½¨Ê§°ÜÔòÍË³ö³ÌĞò
+		je ExitProgram		;åˆ›å»ºå¤±è´¥åˆ™é€€å‡ºç¨‹åº
 		mov hMainWnd,eax	
 		
-		;4. ³õÊ¼»¯²¢ÏÔÊ¾
-		push SW_SHOW		;¿Ø¼şµÄ×´Ì¬ ÏÔÊ¾´°¿Ú
+		;4. åˆå§‹åŒ–å¹¶æ˜¾ç¤º
+		push SW_SHOW		;æ§ä»¶çš„çŠ¶æ€ æ˜¾ç¤ºçª—å£
 		push hMainWnd
 		call ShowWindow
 		
 		push hMainWnd
 		call UpdateWindow
 
-		;5. ºóÌ¨whileËÀÑ­»·£¬²»¶Ï»ñÈ¡±¾Ó¦ÓÃ´°¿ÚÉÏµÄMessage£¬¾­¹ı¼òµ¥Ô¤´¦Àíºó·¢ËÍ¸øWinProc»Øµ÷º¯Êı´¦Àí
+		;5. åå°whileæ­»å¾ªç¯ï¼Œä¸æ–­è·å–æœ¬åº”ç”¨çª—å£ä¸Šçš„Messageï¼Œç»è¿‡ç®€å•é¢„å¤„ç†åå‘é€ç»™WinProcå›è°ƒå‡½æ•°å¤„ç†
 	MessageLoop:
 		push NULL
 		push NULL
 		push NULL
 		push offset msg
-		call GetMessage	;»ñÈ¡ÏûÏ¢£¬Ìî³ämsg½á¹¹£ºGetMessage(&msg, NULL, 0, 0)
+		call GetMessage	;è·å–æ¶ˆæ¯ï¼Œå¡«å……msgç»“æ„ï¼šGetMessage(&msg, NULL, 0, 0)
 		
 		cmp eax,0
-		je ExitProgram	;Èç¹û»ñÈ¡ÏûÏ¢Ê§°Ü¾ÍÍË³ö
+		je ExitProgram	;å¦‚æœè·å–æ¶ˆæ¯å¤±è´¥å°±é€€å‡º
 		
 		push offset msg
-		call TranslateMessage	;µ÷ÕûmsgÄÚÏûÏ¢£¬×ª»»³É¸üºÃµÄ¸ñÊ½
+		call TranslateMessage	;è°ƒæ•´msgå†…æ¶ˆæ¯ï¼Œè½¬æ¢æˆæ›´å¥½çš„æ ¼å¼
 		push offset msg
-		call DispatchMessage	;½«ÏûÏ¢´«¸øWinProc»Øµ÷º¯Êı£¬Õâ¸öDispatchº¯ÊıÆäÊµÊÇ½«4¸ö²ÎÊıpush½øÕ»ºó£¬µ÷ÓÃWinProcº¯Êı
-		;ÊÇ·ñ¹ıÂËÏûÏ¢£¿
+		call DispatchMessage	;å°†æ¶ˆæ¯ä¼ ç»™WinProcå›è°ƒå‡½æ•°ï¼Œè¿™ä¸ªDispatchå‡½æ•°å…¶å®æ˜¯å°†4ä¸ªå‚æ•°pushè¿›æ ˆåï¼Œè°ƒç”¨WinProcå‡½æ•°
+		;æ˜¯å¦è¿‡æ»¤æ¶ˆæ¯ï¼Ÿ
 
 		jmp MessageLoop
 
@@ -287,77 +287,77 @@ WinMain:
 		push 0
 		call ExitProcess
 
-;»Øµ÷º¯Êı£¬ÓÃÓÚÏìÓ¦´°¿ÚÉÏ²úÉúµÄÒ»ÇĞÊÂ¼ş£¬±ÈÈçÊó±ê£¬¼üÅÌµÈ¡£
+;å›è°ƒå‡½æ•°ï¼Œç”¨äºå“åº”çª—å£ä¸Šäº§ç”Ÿçš„ä¸€åˆ‡äº‹ä»¶ï¼Œæ¯”å¦‚é¼ æ ‡ï¼Œé”®ç›˜ç­‰ã€‚
 WinProc:
-		;º¯ÊıÔ­ĞÍ£ºLRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-		;²ÎÊıÁĞ±í£º
-		;ebp+8£ºHWND hWnd,´°¿Ú¾ä±ú
-		;ebp+12£ºUINT message, ÊÂ¼şÀàĞÍ£¬±ÈÈç°´ÏÂ¼üÅÌ£¬ÒÆ¶¯Êó±ê
-		;ebp+16£ºWPARAM wParam,ÊÂ¼ş¾ßÌåĞÅÏ¢£¬±ÈÈç¼üÅÌ£º
-			;38ÉÏ 40ÏÂ 37×ó 39ÓÒ 
+		;å‡½æ•°åŸå‹ï¼šLRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+		;å‚æ•°åˆ—è¡¨ï¼š
+		;ebp+8ï¼šHWND hWnd,çª—å£å¥æŸ„
+		;ebp+12ï¼šUINT message, äº‹ä»¶ç±»å‹ï¼Œæ¯”å¦‚æŒ‰ä¸‹é”®ç›˜ï¼Œç§»åŠ¨é¼ æ ‡
+		;ebp+16ï¼šWPARAM wParam,äº‹ä»¶å…·ä½“ä¿¡æ¯ï¼Œæ¯”å¦‚é”®ç›˜ï¼š
+			;38ä¸Š 40ä¸‹ 37å·¦ 39å³ 
 			;32space 13enter 27esc
 			;65a 68d 83s 87w
-		;ebp+24£ºLPARAM lParam
+		;ebp+24ï¼šLPARAM lParam
 
-		push ebp		;±»µ÷ÓÃÕß±£´æ¼Ä´æÆ÷
-		mov ebp,esp		;Õ»¶¥Ö¸Õë%esp
+		push ebp		;è¢«è°ƒç”¨è€…ä¿å­˜å¯„å­˜å™¨
+		mov ebp,esp		;æ ˆé¡¶æŒ‡é’ˆ%esp
 
-		;µÚÒ»¼¶·ÖÖ§½á¹¹£¬¸ù¾İ»ù±¾ÊÂ¼şÀàĞÍ×ªµ½²»Í¬·ÖÖ§
-		mov eax,[ebp+12]	;È¡message²ÎÊı
+		;ç¬¬ä¸€çº§åˆ†æ”¯ç»“æ„ï¼Œæ ¹æ®åŸºæœ¬äº‹ä»¶ç±»å‹è½¬åˆ°ä¸åŒåˆ†æ”¯
+		mov eax,[ebp+12]	;å–messageå‚æ•°
 
-		cmp eax,WM_KEYDOWN	;°´ÏÂ¼üÅÌ£¬½«¶ÔÓ¦µÄHold±äÁ¿¸³1£¬ÇÒ½øĞĞ¶ÔÓ¦²Ù×÷
+		cmp eax,WM_KEYDOWN	;æŒ‰ä¸‹é”®ç›˜ï¼Œå°†å¯¹åº”çš„Holdå˜é‡èµ‹1ï¼Œä¸”è¿›è¡Œå¯¹åº”æ“ä½œ
 		je KeyDownMessage
-		cmp eax,WM_KEYUP	;ËÉ¿ª¼üÅÌ£¬½«¶ÔÓ¦µÄHold±äÁ¿¸³0
+		cmp eax,WM_KEYUP	;æ¾å¼€é”®ç›˜ï¼Œå°†å¯¹åº”çš„Holdå˜é‡èµ‹0
 		je KeyUpMessage
-		cmp eax,WM_CREATE	;ÔÚ³ÌĞòÔËĞĞÖ®³õ£¬³õÊ¼»¯´°¿Ú£¬Ö»»áµ÷ÓÃÒ»´Î
+		cmp eax,WM_CREATE	;åœ¨ç¨‹åºè¿è¡Œä¹‹åˆï¼Œåˆå§‹åŒ–çª—å£ï¼Œåªä¼šè°ƒç”¨ä¸€æ¬¡
 		je CreateWindowMessage
-		cmp eax,WM_CLOSE	;µã»÷´°¿ÚÓÒÉÏ½Ç¡ÁºÅ£¬¹Ø±Õ´°¿Ú£¬ÍË³ö³ÌĞò£¬Í¬Ê±Ïú»ÙºóÌ¨µÄ¼ÆÊ±Æ÷
+		cmp eax,WM_CLOSE	;ç‚¹å‡»çª—å£å³ä¸Šè§’Ã—å·ï¼Œå…³é—­çª—å£ï¼Œé€€å‡ºç¨‹åºï¼ŒåŒæ—¶é”€æ¯åå°çš„è®¡æ—¶å™¨
 		je CloseWindowMessage
-		cmp eax,WM_PAINT	;ÈÎºÎ¶Ô´°¿ÚµÄ¸ü¸Ä£¬¶¼»á²úÉúÒ»¸öWM_PAINTÏûÏ¢£¨°üÀ¨¶¨Ê±Æ÷Ò²»á´¥·¢WM_PAINT£©
+		cmp eax,WM_PAINT	;ä»»ä½•å¯¹çª—å£çš„æ›´æ”¹ï¼Œéƒ½ä¼šäº§ç”Ÿä¸€ä¸ªWM_PAINTæ¶ˆæ¯ï¼ˆåŒ…æ‹¬å®šæ—¶å™¨ä¹Ÿä¼šè§¦å‘WM_PAINTï¼‰
 		je PaintMessage
-		cmp eax,WM_TIMER	;¼ÆÊ±Æ÷ÊÂ¼ş£¬Ã¿¸ôÒ»¶ÎÊ±¼äÖØĞÂ»æÖÆ´°¿Ú£¨»ù±¾ºÍPaintMessage½»Ìæ³öÏÖ£©
+		cmp eax,WM_TIMER	;è®¡æ—¶å™¨äº‹ä»¶ï¼Œæ¯éš”ä¸€æ®µæ—¶é—´é‡æ–°ç»˜åˆ¶çª—å£ï¼ˆåŸºæœ¬å’ŒPaintMessageäº¤æ›¿å‡ºç°ï¼‰
 		je TimerMessage
 		
-		jmp OtherMessage	;½»ÓÉÄ¬ÈÏ»Øµ÷º¯Êı´¦Àí
+		jmp OtherMessage	;äº¤ç”±é»˜è®¤å›è°ƒå‡½æ•°å¤„ç†
 	
-		;µÚ¶ş¼¶·ÖÖ§£¬Í¨¹ıÅĞ¶Ï¾ßÌåÊÂ¼şÀàĞÍ×ªµ½²»Í¬·ÖÖ§
-		;°´¼üÏÂÑ¹
-		;ÏÂÃæµÄ¸÷¸ö·ÖÖ§¶ÔÓ¦ÉÏÏÂ×óÓÒwasdµÈ¸÷ÖÖ¼ü£¬¿Õ¸ñºÍenterÖ´ĞĞÏàÍ¬¹¦ÄÜ£¨Ìø×ªµÄlabelÏàÍ¬£©
-		;×¢Òâ£¬ËùÓĞ°´¼ü¶¼»áÓ°ÏìHold±äÁ¿£¬µ«ÊÇup£¬down£¬esc£¬spaceºÍenter»áµ÷ÓÃ¶îÍâµÄ´¦Àíº¯Êı£¬±ÈÈç½çÃæÌø×ª£¬·¢Éä×Óµ¯µÈµÈ
+		;ç¬¬äºŒçº§åˆ†æ”¯ï¼Œé€šè¿‡åˆ¤æ–­å…·ä½“äº‹ä»¶ç±»å‹è½¬åˆ°ä¸åŒåˆ†æ”¯
+		;æŒ‰é”®ä¸‹å‹
+		;ä¸‹é¢çš„å„ä¸ªåˆ†æ”¯å¯¹åº”ä¸Šä¸‹å·¦å³wasdç­‰å„ç§é”®ï¼Œç©ºæ ¼å’Œenteræ‰§è¡Œç›¸åŒåŠŸèƒ½ï¼ˆè·³è½¬çš„labelç›¸åŒï¼‰
+		;æ³¨æ„ï¼Œæ‰€æœ‰æŒ‰é”®éƒ½ä¼šå½±å“Holdå˜é‡ï¼Œä½†æ˜¯upï¼Œdownï¼Œescï¼Œspaceå’Œenterä¼šè°ƒç”¨é¢å¤–çš„å¤„ç†å‡½æ•°ï¼Œæ¯”å¦‚ç•Œé¢è·³è½¬ï¼Œå‘å°„å­å¼¹ç­‰ç­‰
 	KeyDownMessage:
-		mov eax,[ebp+16];È¡wParam²ÎÊı
+		mov eax,[ebp+16];å–wParamå‚æ•°
 
 		cmp eax,38
 		jne @nup1
-		call UpInMenu;ÉÏ
+		call UpInMenu;ä¸Š
 		mov UpKeyHold,1
 	@nup1:
 		cmp eax,40
 		jne @ndown1
-		call DownInMenu;ÏÂ
+		call DownInMenu;ä¸‹
 		mov DownKeyHold,1
 	@ndown1:
 		cmp eax,37
 		jne @nleft1
-		mov LeftKeyHold,1;×ó
+		mov LeftKeyHold,1;å·¦
 	@nleft1:
 		cmp eax,39
 		jne @nright1
-		mov RightKeyHold,1;ÓÒ
+		mov RightKeyHold,1;å³
 	@nright1:
 		cmp eax,32
 		jne @nspace1
 		mov SpaceKeyHold,1
-		call EnterInMenu;¿Õ¸ñ£¬µ÷ÓÃº¯Êı
+		call EnterInMenu;ç©ºæ ¼ï¼Œè°ƒç”¨å‡½æ•°
 	@nspace1:
 		cmp eax,13
 		jne @nenter1
 		mov EnterKeyHold,1
-		call EnterInMenu;»Ø³µ£¬µ÷ÓÃº¯Êı
+		call EnterInMenu;å›è½¦ï¼Œè°ƒç”¨å‡½æ•°
 	@nenter1:
 		cmp eax,27
 		jne @nescape1
-		call EscapeInMenu;esc¼ü£¬µ÷ÓÃº¯Êı
+		call EscapeInMenu;escé”®ï¼Œè°ƒç”¨å‡½æ•°
 	@nescape1:
 		cmp eax,65
 		jne @na1
@@ -375,10 +375,10 @@ WinProc:
 		jne @nw1
 		mov WKeyHold,1;W
 	@nw1:
-		jmp WinProcExit;²»ĞèÒª´¦ÀíµÄ¼ü
+		jmp WinProcExit;ä¸éœ€è¦å¤„ç†çš„é”®
 		
-		;°´¼üÊÍ·Å
-		;½á¹¹Í¬°´¼üÏÂÑ¹
+		;æŒ‰é”®é‡Šæ”¾
+		;ç»“æ„åŒæŒ‰é”®ä¸‹å‹
 	KeyUpMessage:
 		mov eax,[ebp+16]
 
@@ -424,87 +424,87 @@ WinProc:
 	@nw2:
 		jmp WinProcExit
 
-		;ÔÚ³ÌĞòÔËĞĞÖ®³õ³õÊ¼»¯´°¿ÚĞÅÏ¢£¬Ö»»áµ÷ÓÃÒ»´Î
-		;³õÊ¼»¯Ö»ÊÇ¸øÄãÕûÁË¸ö±³¾°£¬°Ñbitmap¼ÓÔØµ½ÄÚ´æÖĞ
-		;²¢²»Éæ¼°µ½Ì¹¿Ë£¬µØÍ¼Ö®ÀàµÄ»æÖÆ£¬ËùÓĞµÄ»æÖÆ¶¼ÓÉDrawUIÊµÏÖ
+		;åœ¨ç¨‹åºè¿è¡Œä¹‹åˆåˆå§‹åŒ–çª—å£ä¿¡æ¯ï¼Œåªä¼šè°ƒç”¨ä¸€æ¬¡
+		;åˆå§‹åŒ–åªæ˜¯ç»™ä½ æ•´äº†ä¸ªèƒŒæ™¯ï¼ŒæŠŠbitmapåŠ è½½åˆ°å†…å­˜ä¸­
+		;å¹¶ä¸æ¶‰åŠåˆ°å¦å…‹ï¼Œåœ°å›¾ä¹‹ç±»çš„ç»˜åˆ¶ï¼Œæ‰€æœ‰çš„ç»˜åˆ¶éƒ½ç”±DrawUIå®ç°
 	CreateWindowMessage:
-		;»ñÈ¡´°¿Ú¾ä±ú£¬³õÊ¼»¯hMainWnd£¨ÆäÊµÔÚ´ËÖ®Ç°ÒÑ¾­³õÊ¼»¯¹ıÁË£¬»òĞíÕâÁ½¸öÓĞËù²»Í¬£©
+		;è·å–çª—å£å¥æŸ„ï¼Œåˆå§‹åŒ–hMainWndï¼ˆå…¶å®åœ¨æ­¤ä¹‹å‰å·²ç»åˆå§‹åŒ–è¿‡äº†ï¼Œæˆ–è®¸è¿™ä¸¤ä¸ªæœ‰æ‰€ä¸åŒï¼‰
 		mov eax,[ebp+8]
 		mov hMainWnd,eax
 		invoke printf,offset szMsg,eax
 
 		push NULL
-		push 30	;³¬Ê±Öµ£¬Ã¿30¸öÊ±¼äµ¥Î»·¢ËÍÒ»¸öĞÅÏ¢£¬¿ÉÒÔÀí½âÎªË¢ĞÂ¼ä¸ô£¬Ê±ÖÓÖÜÆÚ
+		push 30	;è¶…æ—¶å€¼ï¼Œæ¯30ä¸ªæ—¶é—´å•ä½å‘é€ä¸€ä¸ªä¿¡æ¯ï¼Œå¯ä»¥ç†è§£ä¸ºåˆ·æ–°é—´éš”ï¼Œæ—¶é’Ÿå‘¨æœŸ
 		push 1
 		push hMainWnd
-		call SetTimer	;Îªµ±Ç°´°¿Ú¼ÓÒ»¸ö¼ÆÊ±Æ÷£¬¼ÆÊ±Æ÷»á²»¶Ï·¢³ö¼ÆÊ±Æ÷ÊÂ¼ş
+		call SetTimer	;ä¸ºå½“å‰çª—å£åŠ ä¸€ä¸ªè®¡æ—¶å™¨ï¼Œè®¡æ—¶å™¨ä¼šä¸æ–­å‘å‡ºè®¡æ—¶å™¨äº‹ä»¶
 	
 		push hMainWnd
-		call GetDC			;»ñÈ¡»·¾³ÉÏÏÂÎÄ¾ä±ú£¬¸Ãº¯Êı¼ìË÷Ò»Ö¸¶¨´°¿ÚµÄ¿Í»§ÇøÓò»òÕû¸öÆÁÄ»µÄÏÔÊ¾Éè±¸ÉÏÏÂÎÄ»·¾³µÄ¾ä±ú
-		mov hdc,eax				;·µ»Øµ±Ç°´°¿Ú¹¤×÷ÇøDC¾ä±ú
+		call GetDC			;è·å–ç¯å¢ƒä¸Šä¸‹æ–‡å¥æŸ„ï¼Œè¯¥å‡½æ•°æ£€ç´¢ä¸€æŒ‡å®šçª—å£çš„å®¢æˆ·åŒºåŸŸæˆ–æ•´ä¸ªå±å¹•çš„æ˜¾ç¤ºè®¾å¤‡ä¸Šä¸‹æ–‡ç¯å¢ƒçš„å¥æŸ„
+		mov hdc,eax				;è¿”å›å½“å‰çª—å£å·¥ä½œåŒºDCå¥æŸ„
 		
 		push eax
-		call CreateCompatibleDC	;»·¾³¼æÈİ»¯£º¸Ãº¯Êı´´½¨Ò»¸öÓëÖ¸¶¨Éè±¸¼æÈİµÄÄÚ´æÉè±¸ÉÏÏÂÎÄ»·¾³£¨DC£©
-		mov hdcPic,eax		;¼æÈİµÄÄÚ´æDC¾ä±ú£¨Ïàµ±ÓÚÉú³É¸ö»­²¼£©
+		call CreateCompatibleDC	;ç¯å¢ƒå…¼å®¹åŒ–ï¼šè¯¥å‡½æ•°åˆ›å»ºä¸€ä¸ªä¸æŒ‡å®šè®¾å¤‡å…¼å®¹çš„å†…å­˜è®¾å¤‡ä¸Šä¸‹æ–‡ç¯å¢ƒï¼ˆDCï¼‰
+		mov hdcPic,eax		;å…¼å®¹çš„å†…å­˜DCå¥æŸ„ï¼ˆç›¸å½“äºç”Ÿæˆä¸ªç”»å¸ƒï¼‰
 		
 		push 0
 		push 0
 		push 0
-		push 0	;type=Î»Í¼
+		push 0	;type=ä½å›¾
 		push 1001
 		push hInstance
-		call LoadImageA			;¼ÓÔØ1001ºÅ×ÊÔ´£¨¶ÔÓ¦Ä¿Â¼ÏÂµÄbmp×ÊÔ´Î»Í¼£©
-		mov hbitmap,eax			;·µ»Ø×ÊÔ´Í¼¾ä±ú
+		call LoadImageA			;åŠ è½½1001å·èµ„æºï¼ˆå¯¹åº”ç›®å½•ä¸‹çš„bmpèµ„æºä½å›¾ï¼‰
+		mov hbitmap,eax			;è¿”å›èµ„æºå›¾å¥æŸ„
 		
 		push hbitmap
 		push hdcPic
-		call SelectObject		;°ÑÎ»Í¼·Åµ½DCÖĞ
+		call SelectObject		;æŠŠä½å›¾æ”¾åˆ°DCä¸­
 
 		push hdc
-		call CreateCompatibleDC	;ÎªÊ²Ã´ÕâÀï»¹Òª´´½¨Ò»´Î£¿£¿£¿
-		mov hdcMem,eax	;´´½¨µÚ¶ş¸ö¼æÈİDC
+		call CreateCompatibleDC	;ä¸ºä»€ä¹ˆè¿™é‡Œè¿˜è¦åˆ›å»ºä¸€æ¬¡ï¼Ÿï¼Ÿï¼Ÿ
+		mov hdcMem,eax	;åˆ›å»ºç¬¬äºŒä¸ªå…¼å®¹DC
 
-		push 480	;480->100 ¿ÉÒÔ´ó£¬µ«ÊÇ²»¿ÉÒÔĞ¡
+		push 480	;480->100 å¯ä»¥å¤§ï¼Œä½†æ˜¯ä¸å¯ä»¥å°
 		push 640
 		push hdc
-		call CreateCompatibleBitmap	;¸Ãº¯Êı´´½¨ÓëÖ¸¶¨µÄÉè±¸»·¾³Ïà¹ØµÄÉè±¸¼æÈİµÄÎ»Í¼
-									;Ö¸¶¨¸ß¶È¡¢¿í¶È¡¢Éè±¸»·¾³¾ä±ú(°´ÕÕÉÏÃæÈëÕ»µÄË³ĞòÀ´¿´)
+		call CreateCompatibleBitmap	;è¯¥å‡½æ•°åˆ›å»ºä¸æŒ‡å®šçš„è®¾å¤‡ç¯å¢ƒç›¸å…³çš„è®¾å¤‡å…¼å®¹çš„ä½å›¾
+									;æŒ‡å®šé«˜åº¦ã€å®½åº¦ã€è®¾å¤‡ç¯å¢ƒå¥æŸ„(æŒ‰ç…§ä¸Šé¢å…¥æ ˆçš„é¡ºåºæ¥çœ‹)
 		
-		mov hbitmap,eax	;·µ»Ø´´ÔìºÃµÄÎ»Í¼µÄ¾ä±ú
+		mov hbitmap,eax	;è¿”å›åˆ›é€ å¥½çš„ä½å›¾çš„å¥æŸ„
 		
-		push hbitmap	;°ÑÎ»Í¼¾ä±ú				hdc
-		push hdcMem		;ºÍĞÂµÄµØÍ¼¾ä±ú¶¼Ñ¹ÈëÕ»	hgdobj
-		call SelectObject	;ËÆºõÊÇ½«Á½¸öÈÚºÏÔÚÒ»Æğ£¿£¿
+		push hbitmap	;æŠŠä½å›¾å¥æŸ„				hdc
+		push hdcMem		;å’Œæ–°çš„åœ°å›¾å¥æŸ„éƒ½å‹å…¥æ ˆ	hgdobj
+		call SelectObject	;ä¼¼ä¹æ˜¯å°†ä¸¤ä¸ªèåˆåœ¨ä¸€èµ·ï¼Ÿï¼Ÿ
 		
 		push 0FFFFFFh
 		push hdcMem
-		call SetTextColor	;ÉèÖÃĞÂµØÍ¼µÄÎÄ±¾ÑÕÉ«
+		call SetTextColor	;è®¾ç½®æ–°åœ°å›¾çš„æ–‡æœ¬é¢œè‰²
 		
 		push 0
 		push hdcMem
-		call SetBkColor		;ÉèÖÃ±³¾°ÑÕÉ« ºÚÉ«
+		call SetBkColor		;è®¾ç½®èƒŒæ™¯é¢œè‰² é»‘è‰²
 
 		push hdc
 		push hMainWnd
-		call ReleaseDC		;ÊÍ·ÅÓÉµ÷ÓÃGetDC»òGetWindowDCº¯Êı»ñÈ¡µÄÖ¸¶¨Éè±¸³¡¾°¡£
+		call ReleaseDC		;é‡Šæ”¾ç”±è°ƒç”¨GetDCæˆ–GetWindowDCå‡½æ•°è·å–çš„æŒ‡å®šè®¾å¤‡åœºæ™¯ã€‚
 		
 		jmp WinProcExit
 
-		;¹Ø±Õ´°¿ÚÊÂ¼ş
+		;å…³é—­çª—å£äº‹ä»¶
 	CloseWindowMessage:
 		;invoke printf,offset szMsg,2
 		push 0
-		call PostQuitMessage	;¸ø½ø³Ì·¢ËÍÍË³öÖ¸Áî
+		call PostQuitMessage	;ç»™è¿›ç¨‹å‘é€é€€å‡ºæŒ‡ä»¤
 		push 1
 		push hMainWnd
-		call KillTimer	;¹Ø±Õ¼ÆÊ±Æ÷
+		call KillTimer	;å…³é—­è®¡æ—¶å™¨
 		jmp WinProcExit
 		
-		;»æÖÆËùÓĞµÄUI
-		;ºËĞÄµ÷ÓÃ£ºDrawUI
+		;ç»˜åˆ¶æ‰€æœ‰çš„UI
+		;æ ¸å¿ƒè°ƒç”¨ï¼šDrawUI
 	PaintMessage:
 		invoke printf,offset szMsg,1
-		push offset ps	;»æÖÆ´°¿ÚµÄĞÅÏ¢¶¼ÓĞ
+		push offset ps	;ç»˜åˆ¶çª—å£çš„ä¿¡æ¯éƒ½æœ‰
 		push hMainWnd
 		call BeginPaint
 		mov hdc,eax
@@ -514,7 +514,7 @@ WinProc:
 		
 		push eax
 		push hdcMem
-		call SelectObject	;Ó¦¸ÃÊÇ»æÖÆÓÎÏ·½çÃæÖĞÌ¹¿ËÊıÁ¿µÈµÈĞÅÏ¢µÄ²Ù×÷
+		call SelectObject	;åº”è¯¥æ˜¯ç»˜åˆ¶æ¸¸æˆç•Œé¢ä¸­å¦å…‹æ•°é‡ç­‰ç­‰ä¿¡æ¯çš„æ“ä½œ
 		mov holdbr,eax
 		
 		push SYSTEM_FIXED_FONT
@@ -532,7 +532,7 @@ WinProc:
 		push hdcMem
 		call Rectangle
 
-		call DrawUI	;µ÷ÓÃºËĞÄµÄUI»æÖÆº¯Êı£¬ÔÚ¸ø¶¨±³¾°ÏÂ·ÅÖÃ¸÷ÖÖÍ¼Æ¬×ÊÔ´¡£ËùÓĞµÄ»æÖÆÈ«²¿ÓÉDrawUIÊµÏÖ¡£
+		call DrawUI	;è°ƒç”¨æ ¸å¿ƒçš„UIç»˜åˆ¶å‡½æ•°ï¼Œåœ¨ç»™å®šèƒŒæ™¯ä¸‹æ”¾ç½®å„ç§å›¾ç‰‡èµ„æºã€‚æ‰€æœ‰çš„ç»˜åˆ¶å…¨éƒ¨ç”±DrawUIå®ç°ã€‚
 		
 		push holdbr
 		push hdcMem
@@ -551,7 +551,7 @@ WinProc:
 		push 0
 		push 0
 		push hdc
-		call BitBlt		;¸Ãº¯Êı¶ÔÖ¸¶¨µÄÔ´Éè±¸»·¾³ÖĞµÄÏñËØ½øĞĞÎ»¿é×ª»»£¬ÒÔ´«ËÍµ½Ä¿±êÉè±¸»·¾³¡£
+		call BitBlt		;è¯¥å‡½æ•°å¯¹æŒ‡å®šçš„æºè®¾å¤‡ç¯å¢ƒä¸­çš„åƒç´ è¿›è¡Œä½å—è½¬æ¢ï¼Œä»¥ä¼ é€åˆ°ç›®æ ‡è®¾å¤‡ç¯å¢ƒã€‚
 		
 		push offset ps
 		push hMainWnd
@@ -559,21 +559,21 @@ WinProc:
 		
 		jmp WinProcExit
 	
-		;¼ÆÊ±Æ÷ÊÂ¼ş
-		;ºËĞÄµ÷ÓÃ£ºTimerTick
+		;è®¡æ—¶å™¨äº‹ä»¶
+		;æ ¸å¿ƒè°ƒç”¨ï¼šTimerTick
 	TimerMessage:
 		invoke printf,offset szMsg,2
-		call TimerTick	;ÓÎÏ·¿ªÊ¼ÁË£¿£¿ TimerTickÀïÃæÊÇÓÎÏ·ÔËĞĞÂß¼­
+		call TimerTick	;æ¸¸æˆå¼€å§‹äº†ï¼Ÿï¼Ÿ TimerTické‡Œé¢æ˜¯æ¸¸æˆè¿è¡Œé€»è¾‘
 
 		push 1
 		push NULL
 		push NULL
 		push hMainWnd
-		call RedrawWindow;ÖØĞÂ»­Ò»±é´°¿Ú
+		call RedrawWindow;é‡æ–°ç”»ä¸€éçª—å£
 
 		jmp WinProcExit
 		
-		;Ä¬ÈÏ»Øµ÷º¯Êı
+		;é»˜è®¤å›è°ƒå‡½æ•°
 	OtherMessage:	
 		push [ebp+20]
 		push [ebp+16]
@@ -581,18 +581,18 @@ WinProc:
 		push [ebp+8]
 		call DefWindowProc
 		
-		;ÍË³öWinProc
+		;é€€å‡ºWinProc
 	WinProcExit:
 		mov esp,ebp
 		pop ebp
 		ret 16
 
-;ÉÏÃæµÄ´úÂëÓ¦¸ÃÊÇ×Ü¿ØÇø£¬µ×ÏÂµÄ´úÂëÊÇ¾ßÌåÊµÏÖ¹ı³Ì		
+;ä¸Šé¢çš„ä»£ç åº”è¯¥æ˜¯æ€»æ§åŒºï¼Œåº•ä¸‹çš„ä»£ç æ˜¯å…·ä½“å®ç°è¿‡ç¨‹		
 DrawUI:
-;¾ßÌåÊµÏÖÃ¿¸ö½çÃæµÄÄÚÈİ£º
-;¿ªÊ¼½çÃæ£º¿ªÊ¼ÓÎÏ·¡¢ÍË³öÓÎÏ· menu0
-;Ñ¡Ôñ¹Ø¿¨½çÃæ£ºµ¥ÈË´³¹Ø¡¢µ¥ÈËÌôÕ½¡¢¡¢¡¢
-;tips:³£Á¿ÓĞ¶ÔÓ¦µÄº¬Òå£¬µ«ÎÒ»¹Ã»ÓĞÕÒµ½¶ÔÓ¦µÄ´æ´¢Î»ÖÃ
+;å…·ä½“å®ç°æ¯ä¸ªç•Œé¢çš„å†…å®¹ï¼š
+;å¼€å§‹ç•Œé¢ï¼šå¼€å§‹æ¸¸æˆã€é€€å‡ºæ¸¸æˆ menu0
+;é€‰æ‹©å…³å¡ç•Œé¢ï¼šå•äººé—¯å…³ã€å•äººæŒ‘æˆ˜ã€ã€ã€
+;tips:å¸¸é‡æœ‰å¯¹åº”çš„å«ä¹‰ï¼Œä½†æˆ‘è¿˜æ²¡æœ‰æ‰¾åˆ°å¯¹åº”çš„å­˜å‚¨ä½ç½®
 ;
 ;
 
@@ -613,24 +613,24 @@ DrawUI:
 		push 0Ch
 		push 160
 		push 256
-		push 4		;why 4?ÎÒ¸Ğ¾õ¿ÉÄÜÊÇ×ÖµÄÊıÁ¿£¿£¿£¿ÎÒ¸ÄÁËÖ®ºó¾ÍÅ×³öÒì³£ÁË
+		push 4		;why 4?æˆ‘æ„Ÿè§‰å¯èƒ½æ˜¯å­—çš„æ•°é‡ï¼Ÿï¼Ÿï¼Ÿæˆ‘æ”¹äº†ä¹‹åå°±æŠ›å‡ºå¼‚å¸¸äº†
 		call DrawLine
-		;ÕâĞ©Ó¦¸Ã¶¼ÊÇĞ´×ÖµÄº¯Êı£¬ÎÒ¸ÄÁËÖ®ºóËûµÄ×ÖµÄÄÚÈİ¾Í±äÁË
-		;£¨±ÈÈç¿ªÊ¼ÓÎÏ·±ä³ÉÁË·½¿é¡£¡£¡££©
+		;è¿™äº›åº”è¯¥éƒ½æ˜¯å†™å­—çš„å‡½æ•°ï¼Œæˆ‘æ”¹äº†ä¹‹åä»–çš„å­—çš„å†…å®¹å°±å˜äº†
+		;ï¼ˆæ¯”å¦‚å¼€å§‹æ¸¸æˆå˜æˆäº†æ–¹å—ã€‚ã€‚ã€‚ï¼‰
 
 		push 0Fh
 		push 0Eh
 		push 2Dh	;2D->2F
-		push 2Ch	;2c->2E ÎÒ·¢ÏÖÇ°ÃæÁ½¸ö×Ö±ä³ÉÁË¡°·ÖÊı¡±¡£¡£
+		push 2Ch	;2c->2E æˆ‘å‘ç°å‰é¢ä¸¤ä¸ªå­—å˜æˆäº†â€œåˆ†æ•°â€ã€‚ã€‚
 		push 192
 		push 256
 		push 4
 		call DrawLine
-		;Í¬Àí
-		jmp DrawMenuSelect;Ó¦¸ÃÊÇÒÀÀµ¼üÅÌÊäÈëÀ´½øĞĞÑ¡ÔñµÄ²Ù×÷
+		;åŒç†
+		jmp DrawMenuSelect;åº”è¯¥æ˜¯ä¾èµ–é”®ç›˜è¾“å…¥æ¥è¿›è¡Œé€‰æ‹©çš„æ“ä½œ
 		
 	DrawMode:
-	;¶ÔÓ¦5¸öÑ¡Ïî ¹À¼Æ½á¹¹ºÍÉÏÃæÒ»²ã²î²»¶à
+	;å¯¹åº”5ä¸ªé€‰é¡¹ ä¼°è®¡ç»“æ„å’Œä¸Šé¢ä¸€å±‚å·®ä¸å¤š
 		push 15h
 		push 14h
 		push 17h
@@ -720,24 +720,24 @@ DrawUI:
 		jmp DrawUIReturn
 	
 	DrawMenuSelect:
-	;ÓĞµãÆæ¹Ö£¬²¢²»ÊÇÒ»¸öÊı×Ö¶ÔÓ¦Ò»¸ö²Ù×÷µÄ²ÎÊı£¬£¬
+	;æœ‰ç‚¹å¥‡æ€ªï¼Œå¹¶ä¸æ˜¯ä¸€ä¸ªæ•°å­—å¯¹åº”ä¸€ä¸ªæ“ä½œçš„å‚æ•°ï¼Œï¼Œ
 		push 0Bh
 		push 09h
 		push 35h
 		push 34h
-		;×ÖµÄĞÅÏ¢
-		;ÎÒ¸ÄÁËÖ®ºó·¢ÏÖÓÒÏÂ½ÇµÄ³´·¹ÖÆ×÷³öÏÖÁË´íÎó
-		push 448;448->110 yÖáÎ»ÖÃ
-		push 480;480->110 xÖáÎ»ÖÃ
+		;å­—çš„ä¿¡æ¯
+		;æˆ‘æ”¹äº†ä¹‹åå‘ç°å³ä¸‹è§’çš„ç‚’é¥­åˆ¶ä½œå‡ºç°äº†é”™è¯¯
+		push 448;448->110 yè½´ä½ç½®
+		push 480;480->110 xè½´ä½ç½®
 		push 4
 		call DrawLine
-		;ÓÒÏÂ½ÇµÄ¶«Î÷
+		;å³ä¸‹è§’çš„ä¸œè¥¿
 
 		mov eax,SelectMenu
-		sal eax,5	;5->10 yÖáÒ²»á±ä£¿£¿£¿
-		add eax,160	;160->110 yÖáÎ»ÒÆ¡£¡£
+		sal eax,5	;5->10 yè½´ä¹Ÿä¼šå˜ï¼Ÿï¼Ÿï¼Ÿ
+		add eax,160	;160->110 yè½´ä½ç§»ã€‚ã€‚
 		push eax
-		push 224	;224->110 ¼ıÍ·µÄÎ»ÖÃ xÖáÎ»ÒÆ
+		push 224	;224->110 ç®­å¤´çš„ä½ç½® xè½´ä½ç§»
 		push 10		;10->200
 		call DrawSpirit
 		
@@ -794,19 +794,19 @@ DrawSpirit:
 		sal eax,5
 		sal ebx,5
 
-		push 0FF00h			;Í¸Ã÷É«
-		push 32	;32->16Ô´¸ß¶È ËÆºõ±ä³¤ÁË£¿£¿
-		push 32	;32->16Ô´¿í¶È
+		push 0FF00h			;é€æ˜è‰²
+		push 32	;32->16æºé«˜åº¦ ä¼¼ä¹å˜é•¿äº†ï¼Ÿï¼Ÿ
+		push 32	;32->16æºå®½åº¦
 		push eax
 		push ebx
 		push hdcPic
 		push 32	;32->16
-		push 32	;32->16	ºÃÏñÊÇÕûÌåÍ¼µÄ¿í¶È Ö±½ÓËõ¼õÁË0.5±¶ ±³¾°É«ÎªºÚÉ«¶¼Â©³öÀ´ÁË
-		push [DWORD PTR ebp+16];²»Çå³şµ½µ×ÏëÒª¶ÁÈ¡ÄÄ¸öµØÖ·ÉÏµÄĞÅÏ¢
+		push 32	;32->16	å¥½åƒæ˜¯æ•´ä½“å›¾çš„å®½åº¦ ç›´æ¥ç¼©å‡äº†0.5å€ èƒŒæ™¯è‰²ä¸ºé»‘è‰²éƒ½æ¼å‡ºæ¥äº†
+		push [DWORD PTR ebp+16];ä¸æ¸…æ¥šåˆ°åº•æƒ³è¦è¯»å–å“ªä¸ªåœ°å€ä¸Šçš„ä¿¡æ¯
 		push [DWORD PTR ebp+12]
-		;ÉÏÃæÓ¦¸ÃÊÇÏëÒªÔÚhdcÉÏ»æÖÆµÄÄÚÈİ£»
+		;ä¸Šé¢åº”è¯¥æ˜¯æƒ³è¦åœ¨hdcä¸Šç»˜åˆ¶çš„å†…å®¹ï¼›
 		push hdcMem
-		call TransparentBlt		;°üº¬Í¸Ã÷É«µÄÎ»Í¼»æÖÆ
+		call TransparentBlt		;åŒ…å«é€æ˜è‰²çš„ä½å›¾ç»˜åˆ¶
 
 		mov esp,ebp
 		pop ebp
@@ -849,100 +849,100 @@ DrawLine:
 	DrawLineReturn:
 		ret 12
 
-;°´¼ü¿ØÖÆ
-;ÉÏÏÂ°´¼ü»áÓ°ÏìSelectMenuÖµ£¬ÏÂÒ»´ÎäÖÈ¾µÄÊ±ºò¸ù¾İSelectMenuÖµÈ·¶¨¼ıÍ·Î»ÖÃ
-;ÉÏ
+;æŒ‰é”®æ§åˆ¶
+;ä¸Šä¸‹æŒ‰é”®ä¼šå½±å“SelectMenuå€¼ï¼Œä¸‹ä¸€æ¬¡æ¸²æŸ“çš„æ—¶å€™æ ¹æ®SelectMenuå€¼ç¡®å®šç®­å¤´ä½ç½®
+;ä¸Š
 UpInMenu:
-		;ÉÏÒÆ£¬½çÏŞÎªµ±Ç°½çÃæµÄµÚÒ»¸öÑ¡Ïî	
+		;ä¸Šç§»ï¼Œç•Œé™ä¸ºå½“å‰ç•Œé¢çš„ç¬¬ä¸€ä¸ªé€‰é¡¹	
 		dec SelectMenu
-		cmp SelectMenu,0 ;if SelectMenu<0 then SelectMenu=0£¨±£Ö¤²Ëµ¥ÔÚ·¶Î§ÄÚ£©
+		cmp SelectMenu,0 ;if SelectMenu<0 then SelectMenu=0ï¼ˆä¿è¯èœå•åœ¨èŒƒå›´å†…ï¼‰
 		jnl UpInMenuReturn
 		mov SelectMenu,0	
 	UpInMenuReturn:
 		ret
-;ÏÂ		
+;ä¸‹		
 DownInMenu:
-		;ÏÂÒÆ£¬½çÏŞÎªµ±Ç°½çÃæµÄ×îºóÒ»¸öÑ¡Ïî	
-		push eax;±»µ÷ÓÃ±£»¤eax
+		;ä¸‹ç§»ï¼Œç•Œé™ä¸ºå½“å‰ç•Œé¢çš„æœ€åä¸€ä¸ªé€‰é¡¹	
+		push eax;è¢«è°ƒç”¨ä¿æŠ¤eax
 		inc SelectMenu
 		mov ebx,WhichMenu
-		mov eax,[ButtonNumber+ebx*4];»ñÈ¡µ±Ç°Ò³ÃæÄÚµÄ×î´óÑ¡ÏîÊı
-		dec eax; ĞŞÕı£¬°Ñ×î´óÍ¼±êÊı×ªÎª×î´óÑ¡ÏîË÷Òı
-		cmp SelectMenu,eax	;if SelectMenu>×î´óË÷Òı then SelectMenu=×î´óË÷Òı
+		mov eax,[ButtonNumber+ebx*4];è·å–å½“å‰é¡µé¢å†…çš„æœ€å¤§é€‰é¡¹æ•°
+		dec eax; ä¿®æ­£ï¼ŒæŠŠæœ€å¤§å›¾æ ‡æ•°è½¬ä¸ºæœ€å¤§é€‰é¡¹ç´¢å¼•
+		cmp SelectMenu,eax	;if SelectMenu>æœ€å¤§ç´¢å¼• then SelectMenu=æœ€å¤§ç´¢å¼•
 		jng DownInMenuReturn
 		mov SelectMenu,eax
 	DownInMenuReturn:
 		pop eax
 		ret
-;enter/space¼üÏìÓ¦		
+;enter/spaceé”®å“åº”		
 EnterInMenu:
-		;±¾º¯Êı´óÁ¿Ê¹ÓÃif-else if-else if-elseµÄ·ÖÖ§ÅĞ¶Ï
-		push eax;±£»¤eax
-		;µÚÒ»²ã·ÖÖ§£¬ÅĞ¶Ïµ±Ç°Ëù´¦½çÃæ
-		cmp WhichMenu,2	;ÓÎÏ·½çÃæ£¬Ö±½ÓÌø³ö·ÖÖ§£¨±£ÁôEnterHoldºÍSpaceHold£¬Ë¢ĞÂµÄÊ±ºòÒªÓÃÕâ¸ö·¢×Óµ¯£©
+		;æœ¬å‡½æ•°å¤§é‡ä½¿ç”¨if-else if-else if-elseçš„åˆ†æ”¯åˆ¤æ–­
+		push eax;ä¿æŠ¤eax
+		;ç¬¬ä¸€å±‚åˆ†æ”¯ï¼Œåˆ¤æ–­å½“å‰æ‰€å¤„ç•Œé¢
+		cmp WhichMenu,2	;æ¸¸æˆç•Œé¢ï¼Œç›´æ¥è·³å‡ºåˆ†æ”¯ï¼ˆä¿ç•™EnterHoldå’ŒSpaceHoldï¼Œåˆ·æ–°çš„æ—¶å€™è¦ç”¨è¿™ä¸ªå‘å­å¼¹ï¼‰
 		je EnterInMenuReturn
-		mov SpaceKeyHold,0;²»·¢Éä×Óµ¯ÔòÇåÁãÁ½¸ö¼ü£¨·ÀÖ¹Ó°Ïì×Óµ¯·¢Éä£©
+		mov SpaceKeyHold,0;ä¸å‘å°„å­å¼¹åˆ™æ¸…é›¶ä¸¤ä¸ªé”®ï¼ˆé˜²æ­¢å½±å“å­å¼¹å‘å°„ï¼‰
 		mov EnterKeyHold,0
-		cmp WhichMenu,0	;³õÊ¼½çÃæ
+		cmp WhichMenu,0	;åˆå§‹ç•Œé¢
 		je EnterInMain
-		cmp WhichMenu,1	;Ä£Ê½Ñ¡Ôñ
+		cmp WhichMenu,1	;æ¨¡å¼é€‰æ‹©
 		je EnterInMode
-		cmp WhichMenu,3	;½áÊø½çÃæ
+		cmp WhichMenu,3	;ç»“æŸç•Œé¢
 		je EnterInResult
-		jmp EnterToEndGame;ÒâÍâÇé¿ö½áÊøÓÎÏ·
+		jmp EnterToEndGame;æ„å¤–æƒ…å†µç»“æŸæ¸¸æˆ
 
-		;µÚ¶ş²ã·ÖÖ§
-		;ÏÂÃæµÄEnterInXX¶¼ÊÇÔÚXX½çÃæ½øĞĞÌø×ª·ÖÖ§ÅĞ¶Ï
+		;ç¬¬äºŒå±‚åˆ†æ”¯
+		;ä¸‹é¢çš„EnterInXXéƒ½æ˜¯åœ¨XXç•Œé¢è¿›è¡Œè·³è½¬åˆ†æ”¯åˆ¤æ–­
 
-		;0ºÅ½çÃæ×ªÒÆ£¨³õÊ¼½çÃæ£©
+		;0å·ç•Œé¢è½¬ç§»ï¼ˆåˆå§‹ç•Œé¢ï¼‰
 	EnterInMain:
 		cmp SelectMenu,0
-		je EnterToMode;0ºÅÑ¡Ïî£¬¶ÔÓ¦Ñ¡ÔñÄ£Ê½
+		je EnterToMode;0å·é€‰é¡¹ï¼Œå¯¹åº”é€‰æ‹©æ¨¡å¼
 		cmp SelectMenu,1
-		je EnterToEndGame;·ñÔò¾ÍÊÇ1ºÅÑ¡Ïî£¬¶ÔÓ¦ÍË³öÓÎÏ·
-		jmp EnterToEndGame;Ñ¡µ½ÁËÆäËûÑ¡ÏîÔİ¶¨ÍË³ö£¬ºóĞø¿ÉÒÔ¿¼ÂÇ¼Ó¼ÌĞøÓÎÏ·µÄ·ÖÖ§
+		je EnterToEndGame;å¦åˆ™å°±æ˜¯1å·é€‰é¡¹ï¼Œå¯¹åº”é€€å‡ºæ¸¸æˆ
+		jmp EnterToEndGame;é€‰åˆ°äº†å…¶ä»–é€‰é¡¹æš‚å®šé€€å‡ºï¼Œåç»­å¯ä»¥è€ƒè™‘åŠ ç»§ç»­æ¸¸æˆçš„åˆ†æ”¯
 
-		;1ºÅ½çÃæ×ªÒÆ£¨Ä£Ê½Ñ¡Ôñ£©
+		;1å·ç•Œé¢è½¬ç§»ï¼ˆæ¨¡å¼é€‰æ‹©ï¼‰
 	EnterInMode:
-		cmp SelectMenu,4;Ñ¡Ïî4£¬·µ»ØÉÏ²ã
+		cmp SelectMenu,4;é€‰é¡¹4ï¼Œè¿”å›ä¸Šå±‚
 		je EnterToMain
-		;Ê£ÏÂµÄ0123Ñ¡Ïî¶¼ÊÇ½øÈëÓÎÏ·£¬Ö»²»¹ıÓÎÏ·Ä£Ê½²»Í¬
-		jmp EnterToGame ;×ªÒÆµ½ÓÎÏ·½çÃæ£¬ÔÚ×ª»»¹ı³ÌÖĞÒª¶ÔGameModeºÍIsDoublePlayer½øĞĞ¸³Öµ£¬¸³ÖµºóÍ³Ò»ÇĞ»»µ½½çÃæ2
+		;å‰©ä¸‹çš„0123é€‰é¡¹éƒ½æ˜¯è¿›å…¥æ¸¸æˆï¼Œåªä¸è¿‡æ¸¸æˆæ¨¡å¼ä¸åŒ
+		jmp EnterToGame ;è½¬ç§»åˆ°æ¸¸æˆç•Œé¢ï¼Œåœ¨è½¬æ¢è¿‡ç¨‹ä¸­è¦å¯¹GameModeå’ŒIsDoublePlayerè¿›è¡Œèµ‹å€¼ï¼Œèµ‹å€¼åç»Ÿä¸€åˆ‡æ¢åˆ°ç•Œé¢2
 		jmp EnterInMenuReturn
 
-		;3ºÅ½çÃæ×ªÒÆ£¨½áËã½çÃæ£©
+		;3å·ç•Œé¢è½¬ç§»ï¼ˆç»“ç®—ç•Œé¢ï¼‰
 	EnterInResult:
 		cmp SelectMenu,0
-		je EnterToMain	;0¶ÔÓ¦·µ»ØÖ÷½çÃæ
-		jmp EnterToEndGame	;1¶ÔÓ¦ÍË³öÓÎÏ·
+		je EnterToMain	;0å¯¹åº”è¿”å›ä¸»ç•Œé¢
+		jmp EnterToEndGame	;1å¯¹åº”é€€å‡ºæ¸¸æˆ
 
-		;ÒÔÏÂµÄEnterToXX¶¼ÊÇÒªÍ¨¹ıEnterÇĞ»»µ½XX½çÃæ
+		;ä»¥ä¸‹çš„EnterToXXéƒ½æ˜¯è¦é€šè¿‡Enteråˆ‡æ¢åˆ°XXç•Œé¢
 
-		;×ªÒÆµ½0£º³õÊ¼½çÃæ
+		;è½¬ç§»åˆ°0ï¼šåˆå§‹ç•Œé¢
 	EnterToMain:
 		mov WhichMenu,0
 		mov SelectMenu,0
 		jmp EnterInMenuReturn
 	
-		;×ªÒÆµ½1£ºÄ£Ê½Ñ¡Ôñ
+		;è½¬ç§»åˆ°1ï¼šæ¨¡å¼é€‰æ‹©
 	EnterToMode:
 		mov WhichMenu,1
 		jmp EnterInMenuReturn
 
-		;×ªÒÆµ½2£ºÓÎÏ·½çÃæ
-		;×ªÒÆÇ°½øĞĞÄ£Ê½¸³Öµ
+		;è½¬ç§»åˆ°2ï¼šæ¸¸æˆç•Œé¢
+		;è½¬ç§»å‰è¿›è¡Œæ¨¡å¼èµ‹å€¼
 	EnterToGame:
 		mov eax,SelectMenu
-		and eax,1;È¡SelectMenu×îºóÒ»Î»
-		mov GameMode,eax;0£¬2±ä³É0£¬¶ÔÓ¦´³¹ØÄ£Ê½£¬1,3±ä³É1£¬¶ÔÓ¦ÌôÕ½Ä£Ê½
+		and eax,1;å–SelectMenuæœ€åä¸€ä½
+		mov GameMode,eax;0ï¼Œ2å˜æˆ0ï¼Œå¯¹åº”é—¯å…³æ¨¡å¼ï¼Œ1,3å˜æˆ1ï¼Œå¯¹åº”æŒ‘æˆ˜æ¨¡å¼
 		mov eax,SelectMenu
-		sar eax,1;ËãÊıÓÒÒÆ£¬00bºÍ01b¶¼»á±ä³É00b£¬¶ÔÓ¦µ¥ÈËÄ£Ê½,10bºÍ11b¶¼»á±ä³É11b£¬¶ÔÓ¦Ë«ÈËÄ£Ê½
+		sar eax,1;ç®—æ•°å³ç§»ï¼Œ00bå’Œ01béƒ½ä¼šå˜æˆ00bï¼Œå¯¹åº”å•äººæ¨¡å¼,10bå’Œ11béƒ½ä¼šå˜æˆ11bï¼Œå¯¹åº”åŒäººæ¨¡å¼
 		mov IsDoublePlayer,eax	
 		mov WhichMenu,2
-		call ResetField;ÓÎÏ·³õÊ¼»¯£¿TODO
+		call ResetField;æ¸¸æˆåˆå§‹åŒ–ï¼ŸTODO
 		jmp EnterInMenuReturn
 
-		;ÍË³öÓÎÏ·
+		;é€€å‡ºæ¸¸æˆ
 	EnterToEndGame:
 		push 0
 		call PostQuitMessage
@@ -954,9 +954,9 @@ EnterInMenu:
 		pop eax
 		ret
 
-;esc¼üÏìÓ¦
+;escé”®å“åº”
 EscapeInMenu:
-		;°´ESC»ØÍËµ½³õÊ¼½çÃæ£¬¿ÉÒÔÔÚ³õÊ¼½çÃæÔÙ¼ÓÒ»¸ö¼ÌĞøÓÎÏ·£¨Ö»Òª±£Ö¤ÆäËûÊı¾İ²»±»ĞŞ¸Ä¼´¿É£©
+		;æŒ‰ESCå›é€€åˆ°åˆå§‹ç•Œé¢ï¼Œå¯ä»¥åœ¨åˆå§‹ç•Œé¢å†åŠ ä¸€ä¸ªç»§ç»­æ¸¸æˆï¼ˆåªè¦ä¿è¯å…¶ä»–æ•°æ®ä¸è¢«ä¿®æ”¹å³å¯ï¼‰
 		mov SelectMenu,0
 		mov WhichMenu,0
 		ret
@@ -965,11 +965,11 @@ EscapeInMenu:
 ;game units	
 ResetField:
 		mov [Score],0
-		mov [Score+4],0	;ÓÒÏÂ½ÇÁ½¸ö·ÖÊı
+		mov [Score+4],0	;å³ä¸‹è§’ä¸¤ä¸ªåˆ†æ•°
 		mov eax,GameMode
 		mov ebx,1
 		sub ebx,eax
-		mov [Round],ebx	;¾ö¶¨Ä£Ê½,ebx=1´³¹Ø£¬0ÌôÕ½ ;µ«ËÆºõ¾­¹ıÁËÁ½´Î²Ù×÷
+		mov [Round],ebx	;å†³å®šæ¨¡å¼,ebx=1é—¯å…³ï¼Œ0æŒ‘æˆ˜ ;ä½†ä¼¼ä¹ç»è¿‡äº†ä¸¤æ¬¡æ“ä½œ
 		mov [YourLife],5
 		mov [YourLife+4],5
 		
@@ -978,21 +978,21 @@ ResetField:
 		ret
 		
 NewRound:
-;³õÊ¼»¯º¯Êı
+;åˆå§‹åŒ–å‡½æ•°
 		mov WaitingTime,-1
 
-		mov [YourTank],5	;tank number 1->2 ¿ªÊ¼µÄÊ±ºòÊÇÄÄ¸öÌ¹¿Ë
-		mov [YourTank+4],128;Ì¹¿Ë×óÒÆµ½±ß½ç,Ì¹¿Ë³õÊ¼Î»ÖÃºá×ø±ê
-		mov [YourTank+8],448;Ì¹¿Ë³õÊ¼Î»ÖÃ×İ×ø±ê
-		mov [YourTank+12],3;Ì¹¿Ë³õÊ¼³¯Ïò£¬0ÏòÓÒ£¬Ë³Ê±ÕëÔö¼Ó0-3
-		mov [YourTank+16],7;×Óµ¯ÀàĞÍ
+		mov [YourTank],5	;tank number 1->2 å¼€å§‹çš„æ—¶å€™æ˜¯å“ªä¸ªå¦å…‹
+		mov [YourTank+4],128;å¦å…‹å·¦ç§»åˆ°è¾¹ç•Œ,å¦å…‹åˆå§‹ä½ç½®æ¨ªåæ ‡
+		mov [YourTank+8],448;å¦å…‹åˆå§‹ä½ç½®çºµåæ ‡
+		mov [YourTank+12],3;å¦å…‹åˆå§‹æœå‘ï¼Œ0å‘å³ï¼Œé¡ºæ—¶é’ˆå¢åŠ 0-3
+		mov [YourTank+16],7;å­å¼¹ç±»å‹
 		
 		mov [YourTank+32],2
 		mov [YourTank+36],320
 		mov [YourTank+40],448
 		mov [YourTank+44],3
 		mov [YourTank+48],0
-		;µÚ¶ş²¿·ÖÊÇ¸ÉÉ¶µÄ£¿ È·¶¨Èç¹ûÓĞÍæ¼Ò¶ş µÄ»°Íæ¼Ò¶şµÄ»ù±¾ĞÅÏ¢
+		;ç¬¬äºŒéƒ¨åˆ†æ˜¯å¹²å•¥çš„ï¼Ÿ ç¡®å®šå¦‚æœæœ‰ç©å®¶äºŒ çš„è¯ç©å®¶äºŒçš„åŸºæœ¬ä¿¡æ¯
 
 		cmp IsDoublePlayer,0
 		jne DoublePlayerOfNewRound
@@ -1000,57 +1000,57 @@ NewRound:
 		mov [YourLife+4],0
 		
 	DoublePlayerOfNewRound:
-	;Ë«ÈËÄ£Ê½ÏÂµĞ·½Ì¹¿ËµÄÊıÁ¿
+	;åŒäººæ¨¡å¼ä¸‹æ•Œæ–¹å¦å…‹çš„æ•°é‡
 		
-		mov eax,[Round];ÌôÕ½=0
+		mov eax,[Round];æŒ‘æˆ˜=0
 		mov ebx,12
-		mul ebx;ebxÅĞ¶ÏÎª0»ò12¾ö¶¨²»Í¬Ä£Ê½µĞ·½Ì¹¿ËÊıÁ¿
+		mul ebx;ebxåˆ¤æ–­ä¸º0æˆ–12å†³å®šä¸åŒæ¨¡å¼æ•Œæ–¹å¦å…‹æ•°é‡
 		mov ebx,eax
-		mov eax,[RoundEnemy+ebx] ;+0/+3 999 8 999ÊÇ¸öÉ¶
+		mov eax,[RoundEnemy+ebx] ;+0/+3 999 8 999æ˜¯ä¸ªå•¥
 		mov [EnemyLife],eax
 		mov eax,[RoundEnemy+ebx+4]
 		mov [EnemyLife+4],eax
 		mov eax,[RoundEnemy+ebx+8]
-		mov [EnemyLife+8],eax;ÕıºÃ3ÖÖÌ¹¿Ë
+		mov [EnemyLife+8],eax;æ­£å¥½3ç§å¦å…‹
 
 
 		mov ecx,10
 		mov esi,offset EnemyTank
 	RemoveEnemyTank:
-	;ÖÃÁã
+	;ç½®é›¶
 		mov DWORD ptr [esi],0
 		mov DWORD ptr [esi+16],0
-		add esi,32	;Õâ¸ö²Ù×÷£¿£¿£¿ÒÆµ½ÏÂÒ»ĞĞÈ¥£¿
+		add esi,32	;è¿™ä¸ªæ“ä½œï¼Ÿï¼Ÿï¼Ÿç§»åˆ°ä¸‹ä¸€è¡Œå»ï¼Ÿ
 		loop RemoveEnemyTank
 		
 		mov eax,[Round]
 		mov ebx,225*4
 		mul ebx
-		mov ebx,eax;ebxÅĞ¶ÏÎª0»ò900¾ö¶¨²»Í¬map		ÌôÕ½µÄµØÍ¼ºÍ´³¹ØµÄµØÍ¼£¿
+		mov ebx,eax;ebxåˆ¤æ–­ä¸º0æˆ–900å†³å®šä¸åŒmap		æŒ‘æˆ˜çš„åœ°å›¾å’Œé—¯å…³çš„åœ°å›¾ï¼Ÿ
 		mov ecx,225
 	SetMap:
-	;0ÊÇÌôÕ½Ä£Ê½£¬ 1ÊÇ´³¹ØÄ£Ê½
-		mov eax,[RoundMap+ebx+ecx*4-4];¿ØÖÆ²»Í¬¹Ø¿¨µÄµØÍ¼£¬·Å½ømap
+	;0æ˜¯æŒ‘æˆ˜æ¨¡å¼ï¼Œ 1æ˜¯é—¯å…³æ¨¡å¼
+		mov eax,[RoundMap+ebx+ecx*4-4];æ§åˆ¶ä¸åŒå…³å¡çš„åœ°å›¾ï¼Œæ”¾è¿›map
 		mov [Map+ecx*4-4],eax
 		loop SetMap
 
 		ret
 
-DrawGround:;»­µØÍ¼
-;225´ú±íÒ»¸öµØÍ¼ 225*4´ú±íÒ»¸öµØÍ¼µÄ´óĞ¡
+DrawGround:;ç”»åœ°å›¾
+;225ä»£è¡¨ä¸€ä¸ªåœ°å›¾ 225*4ä»£è¡¨ä¸€ä¸ªåœ°å›¾çš„å¤§å°
 		mov ecx,225
 	DrawGroundLoop:
-	;»­µØÃæº¯Êı(ÄàÍÁ°ÍÀ­°ÍÀ­)
+	;ç”»åœ°é¢å‡½æ•°(æ³¥åœŸå·´æ‹‰å·´æ‹‰)
 		mov edx,0
 		mov eax,ecx
 		dec eax;eax=ecx-1	224
 		mov esi,15
-		div esi;edx=eax%15,eax=eax/15,eaxÃ¿15ÂÖ¼õÒ»£¬edxÃ¿ÂÖ¼õÒ»£¬Ã¿¸öµØÍ¼15ÁĞ15ĞĞ£¬edxÊÇÁĞ£¬eaxÊÇĞĞ
-		sal edx,5;ÆğÊ¼map1¡¾14,14¡¿£¬ÕâÒ»²½À©Õ¹µ½¡¾448,448¡¿
+		div esi;edx=eax%15,eax=eax/15,eaxæ¯15è½®å‡ä¸€ï¼Œedxæ¯è½®å‡ä¸€ï¼Œæ¯ä¸ªåœ°å›¾15åˆ—15è¡Œï¼Œedxæ˜¯åˆ—ï¼Œeaxæ˜¯è¡Œ
+		sal edx,5;èµ·å§‹map1ã€14,14ã€‘ï¼Œè¿™ä¸€æ­¥æ‰©å±•åˆ°ã€448,448ã€‘
 		sal eax,5
-		add edx,80;¡¾448,528¡¿
+		add edx,80;ã€448,528ã€‘
 		
-		cmp [Map+ecx*4-4],1	;ÎªÊ²Ã´»á´æ×Å1ÄØ£¿
+		cmp [Map+ecx*4-4],1	;ä¸ºä»€ä¹ˆä¼šå­˜ç€1å‘¢ï¼Ÿ
 		je DrawGroundWater
 		
 		push ecx
@@ -1095,19 +1095,19 @@ DrawWall:
 		mov eax,ecx ;eax=225
 		dec eax
 		mov esi,15
-		div esi;edx=eax%15,eax=eax/15,eaxÃ¿15ÂÖ¼õÒ»£¬edxÃ¿ÂÖ¼õÒ»£¬Ã¿¸öµØÍ¼15ÁĞ15ĞĞ£¬edxÊÇÁĞ£¬eaxÊÇĞĞ
+		div esi;edx=eax%15,eax=eax/15,eaxæ¯15è½®å‡ä¸€ï¼Œedxæ¯è½®å‡ä¸€ï¼Œæ¯ä¸ªåœ°å›¾15åˆ—15è¡Œï¼Œedxæ˜¯åˆ—ï¼Œeaxæ˜¯è¡Œ
 		sal edx,5
 		sal eax,5
 		add edx,80
 		
-		;ÅĞ¶ÏµØÍ¼¾ØÕóÖĞµÄÖµÊôÓÚÄÄÒ»¸ö£¬È»ºóÈ¥¶ÔÓ¦µÄº¯Êı½øĞĞ»æÖÆ
-		test [Map+ecx*4-4],4 ;ËÆºõÃ»ÓĞ³öÏÖ
+		;åˆ¤æ–­åœ°å›¾çŸ©é˜µä¸­çš„å€¼å±äºå“ªä¸€ä¸ªï¼Œç„¶åå»å¯¹åº”çš„å‡½æ•°è¿›è¡Œç»˜åˆ¶
+		test [Map+ecx*4-4],4 ;ä¼¼ä¹æ²¡æœ‰å‡ºç°
 		jnz DrawWallHalf
-		cmp [Map+ecx*4-4],3	;×©Ç½
+		cmp [Map+ecx*4-4],3	;ç –å¢™
 		je DrawWallBlock
-		cmp [Map+ecx*4-4],11;ÌúÇ½
+		cmp [Map+ecx*4-4],11;é“å¢™
 		je DrawWallMetal
-		cmp [Map+ecx*4-4],8	;ÀÏ¼Ò
+		cmp [Map+ecx*4-4],8	;è€å®¶
 		je DrawWallBase
 		
 	DrawWallDoLoop:
@@ -1136,13 +1136,13 @@ DrawWall:
 		push ecx
 		push eax
 		push edx
-		push 8	;ºìÆì×Ó
+		push 8	;çº¢æ——å­
 		call DrawSpirit
 		pop ecx
 		jmp DrawWallDoLoop
 		
 	DrawWallHalf:
-		test [Map+ecx*4-4],8;°ë¸öÇ½µÄÂß¼­ÊÇ¸öÉ¶¡£¡£¡£+
+		test [Map+ecx*4-4],8;åŠä¸ªå¢™çš„é€»è¾‘æ˜¯ä¸ªå•¥ã€‚ã€‚ã€‚+
 		jnz DrawMetalWallHalf
 		mov ebx,[Map+ecx*4-4]
 		and ebx,3 ;ebx=8 and 3? 0???
@@ -1172,20 +1172,20 @@ DrawWall:
 		ret
 
 DrawTankAndBullet:
-;»æÖÆÌ¹¿ËºÍ×Óµ¯£¬¸ù¾İyourtankµÄ²ÎÊıÀ´Ñ¡Ôñ¶ÔÓ¦µÄÎ»Í¼À´ÊµÏÖ»æÖÆ
+;ç»˜åˆ¶å¦å…‹å’Œå­å¼¹ï¼Œæ ¹æ®yourtankçš„å‚æ•°æ¥é€‰æ‹©å¯¹åº”çš„ä½å›¾æ¥å®ç°ç»˜åˆ¶
 
 		mov esi,offset YourTank
-		mov ecx,12	;why 12 times? ÎÒ·¢ÏÖ¸ÄÁËÖ®ºó²¢²»»áÓ°ÏìÊµ¼ÊµÄ×Óµ¯µÄÔËĞĞ£¬·´µ¹ÊÇ·É»úÒşĞÎÁË¡£¡£¡£
+		mov ecx,12	;why 12 times? æˆ‘å‘ç°æ”¹äº†ä¹‹åå¹¶ä¸ä¼šå½±å“å®é™…çš„å­å¼¹çš„è¿è¡Œï¼Œåå€’æ˜¯é£æœºéšå½¢äº†ã€‚ã€‚ã€‚
 	DrawTankAndBulletLoop:
 		push esi
 		mov eax,0
-		cmp [esi],eax;Ì¹¿ËÊÇ·ñÎª0
+		cmp [esi],eax;å¦å…‹æ˜¯å¦ä¸º0
 		je GoToDrawBulletIThink
 		push ecx
-		mov eax,[esi];µÚ¼¸ÖÖÌ¹¿Ë
+		mov eax,[esi];ç¬¬å‡ ç§å¦å…‹
 		inc eax
 		sal eax,3
-		;ÕÒµ½Î»Í¼ÖĞµÄµØÖ·
+		;æ‰¾åˆ°ä½å›¾ä¸­çš„åœ°å€
 		add eax,[esi+12]
 		mov ebx,[esi+4]
 		add ebx,80
@@ -1193,15 +1193,15 @@ DrawTankAndBullet:
 		push [esi+8]
 		push ebx
 		push eax
-		;½«Î»ÖÃ¡¢³õÊ¼³¯Ïò¶¼Ñ¹ÈëÕ» Ê¹ÓÃdrawspiritÀ´»æÖÆ
+		;å°†ä½ç½®ã€åˆå§‹æœå‘éƒ½å‹å…¥æ ˆ ä½¿ç”¨drawspiritæ¥ç»˜åˆ¶
 		call DrawSpirit
 		pop ecx
 
 	GoToDrawBulletIThink:
-		mov esi,[esp];Ó¦¸Ã»¹ÊÇesi
-		add esi,16	;Ìø×ªµ½×Óµ¯µÄÃèÊö²¿·Ö
+		mov esi,[esp];åº”è¯¥è¿˜æ˜¯esi
+		add esi,16	;è·³è½¬åˆ°å­å¼¹çš„æè¿°éƒ¨åˆ†
 		mov eax,0
-		cmp [esi],eax	;ÊÇ·ñÎª0£¨²»´æÔÚ£©
+		cmp [esi],eax	;æ˜¯å¦ä¸º0ï¼ˆä¸å­˜åœ¨ï¼‰
 		je DrawTankAndBulletLoopContinue
 		push ecx
 		mov eax,[esi]
@@ -1217,12 +1217,12 @@ DrawTankAndBullet:
 		
 	DrawTankAndBulletLoopContinue:
 		pop esi
-		add esi,32	;Ìø×ªµ½ÏÂÒ»¸öÌ¹¿Ë£¬½øĞĞ»æÖÆ ×î¶à¿ÉÒÔ´æÔÚ12¸ö°É£¿
+		add esi,32	;è·³è½¬åˆ°ä¸‹ä¸€ä¸ªå¦å…‹ï¼Œè¿›è¡Œç»˜åˆ¶ æœ€å¤šå¯ä»¥å­˜åœ¨12ä¸ªå§ï¼Ÿ
 		loop DrawTankAndBulletLoop
 		ret
 
 DrawTree:
-;»­Ê÷µÄ²¿·Ö
+;ç”»æ ‘çš„éƒ¨åˆ†
 		mov ecx,225
 	DrawTreeLoop:
 		mov edx,0
@@ -1245,7 +1245,7 @@ DrawTree:
 		push ecx
 		push eax
 		push edx
-		push 7	;Î»Í¼µÄµÚÆß¸ö ÎªÉ¶Ã»ÓĞÁË£¬£¬£¬
+		push 7	;ä½å›¾çš„ç¬¬ä¸ƒä¸ª ä¸ºå•¥æ²¡æœ‰äº†ï¼Œï¼Œï¼Œ
 		call DrawSpirit
 		pop ecx
 		
@@ -1255,23 +1255,23 @@ DrawTree:
 		ret
 		
 DrawSideBar:
-;»­±ß¿òÀïµÄÄÚÈİ
+;ç”»è¾¹æ¡†é‡Œçš„å†…å®¹
 		mov ecx,5
 		mov eax,64	;64->10
 		mov ebx,16
-		mov esi,offset YourLife ;ÉúÃü£¨Á½¸öÍæ¼ÒµÄ£©
+		mov esi,offset YourLife ;ç”Ÿå‘½ï¼ˆä¸¤ä¸ªç©å®¶çš„ï¼‰
 	DrawSideBarLoop:
 		push esi
 		push ebx
 		push ecx
 		push eax
 		
-		push eax	;YÆ«ÒÆÁ¿
-		push 400	;568->	XÆ«ÒÆÎ»ÖÃ
+		push eax	;Yåç§»é‡
+		push 400	;568->	Xåç§»ä½ç½®
 		push ebx	;16
 		call DrawSpirit
 		
-		;ÃüµÄÊı×Ö
+		;å‘½çš„æ•°å­—
 		mov eax,[esi]
 		mov edx,0
 		mov ebx,10
@@ -1286,49 +1286,49 @@ DrawSideBar:
 		push eax
 		push 608		;608->1000
 		push hdcMem
-		call TextOut	;Êä³öÎÄ±¾
+		call TextOut	;è¾“å‡ºæ–‡æœ¬
 		
 		pop eax
 		pop ecx
 		pop ebx
 		pop esi
 		add esi,4
-		add ebx,8	;»»×öÎ»Í¼ÖĞÏÂÒ»¸ö·É»úÀ´»æÖÆ
+		add ebx,8	;æ¢åšä½å›¾ä¸­ä¸‹ä¸€ä¸ªé£æœºæ¥ç»˜åˆ¶
 		add eax,48
 		loop DrawSideBarLoop
 		
 		mov eax,0
 	DrawSideBarRepeat:
-	;»æÖÆµÃ·Ö°å ÎÒ¸Ğ¾õÊÇÎŞÏŞÑ­»·µÄ¡£¡£¡£
-	;£¨ÒòÎªeax±»±£»¤ÁË º¯Êı½áÊøÖ®ºó¾ÍPop£¬ÀíÂÛÉÏµÃ·ÖÖ®ºóÖ»ÓÃ¸üĞÂscore¼´¿É£¬È»ºóÕâÀï²»¶Ï¶ÁÈ¡scoreµÄÄÚÈİ£©
+	;ç»˜åˆ¶å¾—åˆ†æ¿ æˆ‘æ„Ÿè§‰æ˜¯æ— é™å¾ªç¯çš„ã€‚ã€‚ã€‚
+	;ï¼ˆå› ä¸ºeaxè¢«ä¿æŠ¤äº† å‡½æ•°ç»“æŸä¹‹åå°±Popï¼Œç†è®ºä¸Šå¾—åˆ†ä¹‹ååªç”¨æ›´æ–°scoreå³å¯ï¼Œç„¶åè¿™é‡Œä¸æ–­è¯»å–scoreçš„å†…å®¹ï¼‰
 		push eax
 		sal eax,6
-		add eax,320	;320 ¡°·ÖÊı¡±µÄYÎ»ÖÃ
+		add eax,320	;320 â€œåˆ†æ•°â€çš„Yä½ç½®
 		push 2Fh
 		push 2Eh
 		push eax
 		push 568
 		push 2
 		call DrawLine
-		;»æÖÆ¡°·ÖÊı¡±
+		;ç»˜åˆ¶â€œåˆ†æ•°â€
 
-		;Ã¿´Î¸üĞÂ·ÖÊı°åµÄ²Ù×÷
-		mov esi,[esp]			;ÈÔÈ»´ú±íµÄÊÇÁ½¸öÍæ¼Ò tank
-		mov eax,[Score+4*esi]	;Á½¸öÍæ¼Ò¶ÔÓ¦µÄ·ÖÊı
-		mov esi,offset ScoreText;esi¶ÔÓ¦·ÖÊı°å×Ö·û´®
+		;æ¯æ¬¡æ›´æ–°åˆ†æ•°æ¿çš„æ“ä½œ
+		mov esi,[esp]			;ä»ç„¶ä»£è¡¨çš„æ˜¯ä¸¤ä¸ªç©å®¶ tank
+		mov eax,[Score+4*esi]	;ä¸¤ä¸ªç©å®¶å¯¹åº”çš„åˆ†æ•°
+		mov esi,offset ScoreText;esiå¯¹åº”åˆ†æ•°æ¿å­—ç¬¦ä¸²
 		add esi,5
-		mov ecx,6	;6  ´ú±í¸üĞÂ¶àÉÙÎ»£¨ÓĞ6Î»£©
+		mov ecx,6	;6  ä»£è¡¨æ›´æ–°å¤šå°‘ä½ï¼ˆæœ‰6ä½ï¼‰
 		mov ebx,10
 	DrawSideBarGetScoreText:
-	;½«scoreÖĞµÄÊı×Ö×ª»¯Îª×Ö·ûºó´æÔÚ¶ÔÓ¦µÄscoretestÖĞ
+	;å°†scoreä¸­çš„æ•°å­—è½¬åŒ–ä¸ºå­—ç¬¦åå­˜åœ¨å¯¹åº”çš„scoretestä¸­
 		mov edx,0
 		div ebx
-		add edx,30h	;·ÖÊı(eax)³ıÒÔ10 ÓàÊıÔÚedx£¬Êı×Ö×ª»¯Îª×Ö·û
+		add edx,30h	;åˆ†æ•°(eax)é™¤ä»¥10 ä½™æ•°åœ¨edxï¼Œæ•°å­—è½¬åŒ–ä¸ºå­—ç¬¦
 		mov [esi],dl
 		dec esi
 		loop DrawSideBarGetScoreText
 
-		;»æÖÆ·ÖÊı°åµÄ¹ı³Ì
+		;ç»˜åˆ¶åˆ†æ•°æ¿çš„è¿‡ç¨‹
 		mov edi,[esp]
 		sal edi,6
 		add edi,360
@@ -1354,7 +1354,7 @@ DrawSideBar:
 		ret
 
 TimerTick:
-		cmp WaitingTime,0
+		cmp WaitingTime,0;ç”¨æ¥åˆ¤æ–­ä¸åŒçŠ¶æ€
 		jl DontWait
 		je ChangeGame
 		dec WaitingTime
@@ -1362,7 +1362,7 @@ TimerTick:
 	ChangeGame:
 		cmp YouDie,1
 		jne NotGameOver
-		mov WhichMenu,3
+		mov WhichMenu,3;æ¸¸æˆç»“æŸ
 		mov SelectMenu,0
 	NotGameOver:
 		call NewRound
@@ -1372,15 +1372,15 @@ TimerTick:
 		inc WaterSpirit
 		and WaterSpirit,0Fh
 
-		cmp WhichMenu,2
+		cmp WhichMenu,2;æ­£åœ¨æ¸¸æˆ
 		je TimerTickDontReturn
 		jmp TimerTickReturn
 	TimerTickDontReturn:
 		
-		cmp UpKeyHold,1
+		cmp UpKeyHold,1;å‘ä¸Šé”®
 		jne TT@1
-		mov [YourTank+12],3
-		sub [YourTank+8],4
+		mov [YourTank+12],3;ç§»åŠ¨æ–¹å‘
+		sub [YourTank+8],4;ç§»åŠ¨çš„è·ç¦»
 		push offset YourTank
 		push 1
 		call CheckCanGo
@@ -2241,15 +2241,15 @@ GetBulletRect:	; &bullet
 		ret 4
 		
 GetTankRect:	; &tank
-		mov esi,[esp+4]
-		mov eax,[esi+4]
-		mov ebx,[esi+8]
+		mov esi,[esp+4];esi = yourtank
+		mov eax,[esi+4];eax = x
+		mov ebx,[esi+8];ebx = y
 		add eax,4
 		add ebx,4
 		mov ecx,eax
 		mov edx,ebx
 		add ecx,24
-		add edx,24
+		add edx,24;é£æœºä½ç½®çŸ©é˜µçš„4ä¸ªåæ ‡
 		ret 4
 
 GetBlockRect:	; x,y,istank
