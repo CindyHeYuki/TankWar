@@ -1276,7 +1276,7 @@ DrawSideBar:
 		push eax
 		
 		push eax	;Y偏移量
-		push 400	;568->	X偏移位置
+		push 568	;568->	X偏移位置
 		push ebx	;16
 		call DrawSpirit
 		
