@@ -79,10 +79,21 @@ SpaceKeyHold DWORD 0
 EnterKeyHold DWORD 0
 
 ; 0=土地,1=水,2=树,3=墙,4~7=各种墙(上下左右),8=老家,11=铁,12~15=各种铁
+; Map储存了当前游戏阶段的地图，随着游戏关卡变化而不断变化
 Map			DWORD 225 DUP(?)
-; 类型(0=不存在,1=玩家坦克,2=未使用,3=普通,4=强化,5=快速),X,Y,方向,子弹类型(0=不存在,1=存在,2~9=爆炸),子弹X,Y,方向
+;YourTank，一行对应一个玩家，一列对应一个属性，分别如下：
+;类型(0=不存在,1=玩家坦克,2=未使用,3=普通,4=强化,5=快速)
+;X
+;Y
+;方向
+;子弹类型(0=不存在,1=存在,2~9=爆炸)
+;子弹X
+;子弹Y
+;子弹方向
 YourTank	DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
+			
+;EnemyTank的行数（10）决定了同时能出现的敌方坦克数量，属性和我方坦克一样
 EnemyTank	DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
@@ -96,10 +107,13 @@ EnemyTank	DWORD 0,0,0,0,0,0,0,0
 YourLife	DWORD 0,0
 EnemyLife	DWORD 0,0,0
 Score		DWORD 0,0
-Round		DWORD 0
+Round		DWORD 0	;Round决定了你用哪个地图，0对应无尽模式，12345对应挑战模式的5个关卡
 WaitingTime	DWORD -1
-YouDie		DWORD 0
+YouDie		DWORD 0	;0代表存活，1代表YouDie
 
+;RoundMap存放了预留的地图
+;0是无尽模式，12345对应闯关
+;地图尺寸为225=15×15
 			; Round 0 (挑战模式)
 RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 			DWORD  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
@@ -197,7 +211,10 @@ RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 			DWORD  0, 0, 3, 1, 0, 0, 3, 3, 3, 0, 0, 1, 3, 0, 0
 			DWORD  0, 0,11, 1, 0, 0, 3, 8, 3, 0, 0, 1,11, 0, 0
 
-;不太确定这里的enemy的含义
+;RoundEnemy以三个为一节，规定了某个Round中三种坦克的最大总生命
+;比如Round0无尽模式，三种坦克都是999
+;Round1，只有8个基础坦克
+;Round5，有8基础，5加强，5坦克王
 RoundEnemy	DWORD 999,999,999,8,0,0,8,0,0,8,0,2,9,3,4,8,5,5
 RoundSpeed	DWORD 1,60,60,60,50,50,1
 
@@ -590,13 +607,8 @@ WinProc:
 ;上面的代码是总控区，底下的代码是具体实现过程
 ;核心函数：DrawSpirit 前两个参数是坐标，第三个参数是图片标号
 ;核心函数：DrawLine 参数为 字的标号（数量可变） xy坐标 字的数量（根据最开始的参数个数改变）。
-;具体用法请去 DrawMenuSelect的位置参考
+;这两个函数的具体用法请去 DrawMenuSelect的位置参考
 DrawUI:
-;具体实现每个界面的内容：
-;开始界面：开始游戏、退出游戏 menu0
-;选择关卡界面：单人闯关、单人挑战、、、
-;tips:常量有对应的含义，但我还没有找到对应的存储位置
-;
 		;第一级分支：根据WhichMenu变量判断当前所处界面，转到对应的绘制分支
 		cmp WhichMenu,0
 		je DrawMain
@@ -748,7 +760,7 @@ DrawUI:
 	DrawUIReturn:
 		ret
 
-;绘制半个墙
+;绘制半个图片（用于绘制半个墙）
 DrawHalfSpirit:
 		push ebp
 		mov ebp,esp
@@ -971,82 +983,84 @@ EscapeInMenu:
 		ret
 
 
-;game units	
+;重置数据
 ResetField:
 		mov [Score],0
-		mov [Score+4],0	;右下角两个分数
+		mov [Score+4],0	;重置两个分数（右下角显示）
+
 		mov eax,GameMode
 		mov ebx,1
 		sub ebx,eax
-		mov [Round],ebx	;决定模式,ebx=1闯关，0挑战 ;但似乎经过了两次操作
-		mov [YourLife],5
-		mov [YourLife+4],5
+		mov [Round],ebx	;Round=1-GameMode，如果GameMode=1（挑战），则Round=0，如果GameMode=0（闯关），则Round=1
+		;Round决定了你用哪个地图，0对应无尽模式，12345对应挑战模式的5个关卡
+		mov [YourLife],5	
+		mov [YourLife+4],5	;重置两个生命
 		
-		mov YouDie,0
+		mov YouDie,0	;存活状态
 		call NewRound
 		ret
-		
-NewRound:
-;初始化函数
-		mov WaitingTime,-1
 
+;初始化函数
+NewRound:
+		mov WaitingTime,-1
+		;玩家1
 		mov [YourTank],5	;tank number 1->2 开始的时候是哪个坦克
 		mov [YourTank+4],128;坦克左移到边界,坦克初始位置横坐标
 		mov [YourTank+8],448;坦克初始位置纵坐标
-		mov [YourTank+12],3;坦克初始朝向，0向右，顺时针增加0-3
-		mov [YourTank+16],7;子弹类型
-		
+		mov [YourTank+12],3 ;坦克初始朝向，0向右，顺时针增加0-3
+		mov [YourTank+16],7 ;子弹类型
+		;玩家2
 		mov [YourTank+32],2
 		mov [YourTank+36],320
 		mov [YourTank+40],448
 		mov [YourTank+44],3
 		mov [YourTank+48],0
-		;第二部分是干啥的？ 确定如果有玩家二 的话玩家二的基本信息
-
+		;判断是否双人，双人就把玩家2标志清0，则后面绘制的时候就不会对玩家2相关数据进行绘制
 		cmp IsDoublePlayer,0
-		jne DoublePlayerOfNewRound
-		mov [YourTank+32],0; no player2
+		jne InitEnemyLife
+		mov [YourTank+32],0	;把玩家2的坦克和生命都清0
 		mov [YourLife+4],0
-		
-	DoublePlayerOfNewRound:
-	;双人模式下敌方坦克的数量
-		
-		mov eax,[Round];挑战=0
+		;注意，这里没有jmp，所以无论单人还是双人，都会执行下面的InitEnemyLife
+
+		;初始化坦克生命，详见初始数据区关于说明RoundEnemy的说明
+	InitEnemyLife:
+		mov eax,[Round]	;计算偏置：ebx=Round×12，因为一个关卡对应3个DWORD数据
 		mov ebx,12
-		mul ebx;ebx判断为0或12决定不同模式敌方坦克数量
-		mov ebx,eax
-		mov eax,[RoundEnemy+ebx] ;+0/+3 999 8 999是个啥
+		mul ebx
+		mov ebx,eax	
+
+		mov eax,[RoundEnemy+ebx] ;根据关卡初始化三种坦克的总生命
 		mov [EnemyLife],eax
 		mov eax,[RoundEnemy+ebx+4]
 		mov [EnemyLife+4],eax
 		mov eax,[RoundEnemy+ebx+8]
-		mov [EnemyLife+8],eax;正好3种坦克
-
-
-		mov ecx,10
+		mov [EnemyLife+8],eax
+		
+		;清空敌方坦克和子弹（对应10行EnemyTank）
+		mov ecx,10	
 		mov esi,offset EnemyTank
 	RemoveEnemyTank:
-	;置零
-		mov DWORD ptr [esi],0
-		mov DWORD ptr [esi+16],0
-		add esi,32	;这个操作？？？移到下一行去？
+		mov DWORD ptr [esi],0	;标记坦克为0不存在
+		mov DWORD ptr [esi+16],0;标记子弹为0不存在
+		add esi,32				;换下一行（下一个坦克）
 		loop RemoveEnemyTank
 		
+		;初始化地图
 		mov eax,[Round]
 		mov ebx,225*4
 		mul ebx
-		mov ebx,eax;ebx判断为0或900决定不同map		挑战的地图和闯关的地图？
-		mov ecx,225
+		mov ebx,eax	;ebx=Round×225×4，锁定了当前Round在RoundMap中的偏移量
+		mov ecx,225	;对应225个地图块，循环225次，把RoundMap中Round对应的地图放到Map中
 	SetMap:
-	;0是挑战模式， 1是闯关模式
-		mov eax,[RoundMap+ebx+ecx*4-4];控制不同关卡的地图，放进map
+		mov eax,[RoundMap+ebx+ecx*4-4]
 		mov [Map+ecx*4-4],eax
 		loop SetMap
 
 		ret
 
-DrawGround:;画地图
-;225代表一个地图 225*4代表一个地图的大小
+;绘制地面
+DrawGround:
+		;225代表一个地图 225*4代表一个地图的大小
 		mov ecx,225
 	DrawGroundLoop:
 	;画地面函数(泥土巴拉巴拉)
