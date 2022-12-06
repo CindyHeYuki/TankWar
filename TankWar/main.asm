@@ -587,15 +587,17 @@ WinProc:
 		pop ebp
 		ret 16
 
-;上面的代码应该是总控区，底下的代码是具体实现过程		
+;上面的代码是总控区，底下的代码是具体实现过程
+;核心函数：DrawSpirit 前两个参数是坐标，第三个参数是图片标号
+;核心函数：DrawLine 参数为 字的标号（数量可变） xy坐标 字的数量（根据最开始的参数个数改变）。
+;具体用法请去 DrawMenuSelect的位置参考
 DrawUI:
 ;具体实现每个界面的内容：
 ;开始界面：开始游戏、退出游戏 menu0
 ;选择关卡界面：单人闯关、单人挑战、、、
 ;tips:常量有对应的含义，但我还没有找到对应的存储位置
 ;
-;
-
+		;第一级分支：根据WhichMenu变量判断当前所处界面，转到对应的绘制分支
 		cmp WhichMenu,0
 		je DrawMain
 		cmp WhichMenu,1
@@ -606,31 +608,32 @@ DrawUI:
 		je DrawResult
 		jmp DrawUIReturn
 
+		;主界面绘制
 	DrawMain:
-		push 0Fh;changed
+		;绘制第一行
+		push 0Fh
 		push 0Eh
 		push 0Dh
 		push 0Ch
 		push 160
 		push 256
-		push 4		;why 4?我感觉可能是字的数量？？？我改了之后就抛出异常了
+		push 4
 		call DrawLine
-		;这些应该都是写字的函数，我改了之后他的字的内容就变了
-		;（比如开始游戏变成了方块。。。）
-
-		push 0Fh
+		;绘制第二行
 		push 0Eh
-		push 2Dh	;2D->2F
-		push 2Ch	;2c->2E 我发现前面两个字变成了“分数”。。
+		push 0Fh
+		push 2Dh	
+		push 2Ch
 		push 192
 		push 256
 		push 4
 		call DrawLine
-		;同理
-		jmp DrawMenuSelect;应该是依赖键盘输入来进行选择的操作
+		;绘制选择箭头与右下角标
+		jmp DrawMenuSelect
 		
+		;选择界面绘制
 	DrawMode:
-	;对应5个选项 估计结构和上面一层差不多
+		;和DrawMain一样，先绘制几行选项
 		push 15h
 		push 14h
 		push 17h
@@ -675,9 +678,10 @@ DrawUI:
 		push 256
 		push 4
 		call DrawLine
-	
+		;和DrawMain一样，绘制选择箭头和右下角标
 		jmp DrawMenuSelect
 		
+		;结算界面绘制，同DrawMain
 	DrawResult:
 
 		push 1Fh
@@ -709,41 +713,42 @@ DrawUI:
 	
 		jmp DrawMenuSelect
 		
-	DrawGame:
-
-		call DrawGround
-		call DrawWall
-		call DrawTankAndBullet
-		call DrawTree
-		call DrawSideBar
+		;游戏界面绘制，与前面不同。
+	DrawGame:	
+		call DrawGround	;绘制土地（宇宙背景），注意，这个是在底层的黑背景上再画一层背景
+		call DrawWall	;绘制墙面
+		call DrawTankAndBullet	;绘制坦克和子弹
+		call DrawTree	;绘制树
+		call DrawSideBar;绘制右边计数
 		
 		jmp DrawUIReturn
 	
+		;选项箭头+右下角标志绘制，适用于0,1,3号界面
 	DrawMenuSelect:
-	;有点奇怪，并不是一个数字对应一个操作的参数，，
-		push 0Bh
+		;右下角绘制，给定4个字，xy坐标，以及4。告诉你有4个字，之后调用DrawLine将一行图片放置上去
+		push 0Bh	;0Bh->0Ch
 		push 09h
 		push 35h
 		push 34h
-		;字的信息
-		;我改了之后发现右下角的炒饭制作出现了错误
+		;push 0Bh	;从无到有，五字测试
 		push 448;448->110 y轴位置
 		push 480;480->110 x轴位置
-		push 4
+		push 4	;4->5 5字测试
 		call DrawLine
-		;右下角的东西
-
+		;箭头绘制，只需要调用DrawSpirit（单块绘制）即可
+		;前两个参数是坐标，第三个参数是图片标号（10对应箭头）
 		mov eax,SelectMenu
-		sal eax,5	;5->10 y轴也会变？？？
-		add eax,160	;160->110 y轴位移。。
+		sal eax,5	;y轴偏移
+		add eax,160
 		push eax
-		push 224	;224->110 箭头的位置 x轴位移
-		push 10		;10->200
+		push 220	;x轴偏移
+		push 10		;图片标号
 		call DrawSpirit
 		
 	DrawUIReturn:
 		ret
 
+;绘制半个墙
 DrawHalfSpirit:
 		push ebp
 		mov ebp,esp
@@ -782,7 +787,9 @@ DrawHalfSpirit:
 		pop ebp
 
 		ret 16
-		
+
+;绘制一个图片
+;核心函数：DrawSpirit 前两个参数是坐标，第三个参数是图片标号	
 DrawSpirit:
 		push ebp
 		mov ebp,esp
@@ -813,6 +820,8 @@ DrawSpirit:
 
 		ret 12
 
+;绘制一行图片（封装DrawSpirit）
+;核心函数：DrawLine 参数为 字的标号（数量可变） xy坐标 字的数量（根据最开始的参数个数改变）。
 DrawLine:
 		mov ecx,[esp+4]
 		cmp ecx,0
