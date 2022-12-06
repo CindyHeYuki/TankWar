@@ -10,7 +10,10 @@
 		* 3.3.1. [WinMain函数](#WinMain)
 		* 3.3.2. [WinProc函数](#WinProc)
 		* 3.3.3. [按键控制区](#-1)
-	* 3.4. [DrawUI区](#DrawUI)
+	* 3.4. [Draw UI](#DrawUI)
+	* 3.5. [规则实现](#-1)
+		* 3.5.1. [功能说明](#-1)
+		* 3.5.2. [具体说明](#-1)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -108,25 +111,22 @@ WinProc有两层分支结构：
 
 ###  3.4. <a name='DrawUI'></a>Draw UI
 
-1.ResetField:
+1. ResetField:  
 主要是初始化右下角的分数、玩家的生命、游戏模式等等基本信息。通过NewRound函数实现飞机基本信息（飞机类型、位置、朝向、子弹类型）的初始化。通过DoublePlayerOfNewRound函数来更新双人模式的敌方飞机数量。通过RemoveEnemyPlane让敌方飞机置零。通过SetMap完成地图地选择。
-
-2.DrawGround:
+2. DrawGround:  
 这一部分主要是绘制地图中各种板块的内容。核心逻辑是：以data段的地图矩阵为基础，循环遍历所有的取值，然后从bmp文件中选择对应的块，画在对应的位置上。这个模块主要包含DrawGround、DrawWall两大部分，绘画逻辑为：判断该位置的数字代表的含义，然后跳转到对应的函数中，调用DrawSpirit、DrawHalfSpirit来完成绘制。
-
-3.DrawPlaneAndBullet：
+3. DrawPlaneAndBullet：  
 这一部分主要绘制坦克和子弹，根据YourPlane的参数来选择对应的位图来实现绘制。坦克是否存在以及子弹是否存在还有位置等等信息都存在YourPlane中。子弹的位置变化和绘制通过GoToDrawBulletIThink、DrawPlaneAndBulletLoopContinue函数来完成。
-
-4.DrawSideBar：
+4. DrawSideBar：  
 绘制边框里的信息（5个飞机形态、得分板）。其中飞机的不同形态通过对bmp文件的读取与绘制实现，得分板的绘制通过读取Score里的数字来得到此时的分数，将数字转化为字符填充到ScoreText中，使用TextOut函数绘制。
 
-###  3.5. <a name='rule'></a>规则实现
+###  3.5. <a name='-1'></a>规则实现
 
-####   3.5.1 功能说明
+####  3.5.1. <a name='-1'></a>功能说明
 
 这部分主要利用timertick函数和一些规则函数来实现游戏的玩法规则和状态更新，其中对于每个控制逻辑中的settimer函数而言，每个时间周期使用一次timertick来更新游戏状态，同时每个周期也会使用一次DrawUI相关函数将所有更新后的内容显示在屏幕上，当时间周期足够短时，每一个静态画面连续播放就有了动画的效果。
 
-####   3.5.2 具体说明
+####  3.5.2. <a name='-1'></a>具体说明
 
 这部分主要说明了游戏如何进行，例如：子弹遇见敌方飞机会爆炸，同时敌方飞机消失并数量减一；玩家飞机不可通过障碍物 等。
 在处理中，每个单元都只保存了坐标参数，因此需要再加上单元的长和宽，当做矩形来处理。
