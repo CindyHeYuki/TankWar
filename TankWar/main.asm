@@ -27,8 +27,8 @@ Crlf PROTO
 .data
 
 szMsg	BYTE "%d",0ah,0
-WindowName BYTE "Tank", 0
-className BYTE "Tank", 0
+WindowName BYTE "StarWar:Before The Dawn", 0
+className BYTE "Plane", 0
 imgName BYTE "djb.bmp", 0
 
 
@@ -50,10 +50,10 @@ ps PAINTSTRUCT <>
 
 BreakWallType DWORD 0
 BreakWallPos DWORD 0
-TankToBreak DWORD 0
+PlaneToBreak DWORD 0
 DirectionMapToW DWORD 4, 2, 3, 1
 BulletMove DWORD 7, 0, -7, 0, 0, 7, 0, -7
-TankMove DWORD 3, 0, -3, 0, 0, 3, 0, -3, 3, 0, -3, 0, 0, 3, 0, -3, 5, 0, -5, 0, 0, 5, 0, -5
+PlaneMove DWORD 3, 0, -3, 0, 0, 3, 0, -3, 3, 0, -3, 0, 0, 3, 0, -3, 5, 0, -5, 0, 0, 5, 0, -5
 BulletPosFix DWORD 10, 0, -10, 0, 0, 10, 0, -10
 DrawHalfSpiritMask DWORD 32, 32, 16, 16, 16, 16, 32, 32, 0, 0, 0, 16, 0, 16, 0, 0
 ScoreText BYTE "000000", 0
@@ -81,8 +81,8 @@ EnterKeyHold DWORD 0
 ; 0=土地,1=水,2=树,3=墙,4~7=各种墙(上下左右),8=老家,11=铁,12~15=各种铁
 ; Map储存了当前游戏阶段的地图，随着游戏关卡变化而不断变化
 Map			DWORD 225 DUP(?)
-;YourTank，一行对应一个玩家，一列对应一个属性，分别如下：
-;类型(0=不存在,1=玩家坦克,2=未使用,3=普通,4=强化,5=快速)
+;YourPlane，一行对应一个玩家，一列对应一个属性，分别如下：
+;类型(0=不存在,1=玩家飞机,2=未使用,3=普通,4=强化,5=快速)
 ;X
 ;Y
 ;方向
@@ -90,11 +90,11 @@ Map			DWORD 225 DUP(?)
 ;子弹X
 ;子弹Y
 ;子弹方向
-YourTank	DWORD 0,0,0,0,0,0,0,0
+YourPlane	DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
 			
-;EnemyTank的行数（10）决定了同时能出现的敌方坦克数量，属性和我方坦克一样
-EnemyTank	DWORD 0,0,0,0,0,0,0,0
+;EnemyPlane的行数（10）决定了同时能出现的敌方飞机数量，属性和我方飞机一样
+EnemyPlane	DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
 			DWORD 0,0,0,0,0,0,0,0
@@ -211,10 +211,10 @@ RoundMap	DWORD  3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3
 			DWORD  0, 0, 3, 1, 0, 0, 3, 3, 3, 0, 0, 1, 3, 0, 0
 			DWORD  0, 0,11, 1, 0, 0, 3, 8, 3, 0, 0, 1,11, 0, 0
 
-;RoundEnemy以三个为一节，规定了某个Round中三种坦克的最大总生命
-;比如Round0无尽模式，三种坦克都是999
-;Round1，只有8个基础坦克
-;Round5，有8基础，5加强，5坦克王
+;RoundEnemy以三个为一节，规定了某个Round中三种飞机的最大总生命
+;比如Round0无尽模式，三种飞机都是999
+;Round1，只有8个基础飞机
+;Round5，有8基础，5加强，5飞机王
 RoundEnemy	DWORD 999,999,999,8,0,0,8,0,0,8,0,2,9,3,4,8,5,5
 RoundSpeed	DWORD 1,60,60,60,50,50,1
 
@@ -239,7 +239,7 @@ WinMain:
 		call GetModuleHandle	;返回模块的句柄
 		mov hInstance,eax		;hInstance中存有句柄
 		
-		push 999				;999代表资源里的tank.ico
+		push 999				;999代表资源里的plane.ico
 		push hInstance
 		call LoadIcon			;加载图标
 		mov MainWin.hIcon,eax	;填充MainWin的图标信息
@@ -443,7 +443,7 @@ WinProc:
 
 		;在程序运行之初初始化窗口信息，只会调用一次
 		;初始化只是给你整了个背景，把bitmap加载到内存中
-		;并不涉及到坦克，地图之类的绘制，所有的绘制都由DrawUI实现
+		;并不涉及到飞机，地图之类的绘制，所有的绘制都由DrawUI实现
 	CreateWindowMessage:
 		;获取窗口句柄，初始化hMainWnd（其实在此之前已经初始化过了，或许这两个有所不同）
 		mov eax,[ebp+8]
@@ -531,7 +531,7 @@ WinProc:
 		
 		push eax
 		push hdcMem
-		call SelectObject	;应该是绘制游戏界面中坦克数量等等信息的操作
+		call SelectObject	;应该是绘制游戏界面中飞机数量等等信息的操作
 		mov holdbr,eax
 		
 		push SYSTEM_FIXED_FONT
@@ -729,7 +729,7 @@ DrawUI:
 	DrawGame:	
 		call DrawGround	;绘制土地（宇宙背景），注意，这个是在底层的黑背景上再画一层背景
 		call DrawWall	;绘制墙面
-		call DrawTankAndBullet	;绘制坦克和子弹
+		call DrawPlaneAndBullet	;绘制飞机和子弹
 		call DrawTree	;绘制树
 		call DrawSideBar;绘制右边计数
 		
@@ -1004,46 +1004,46 @@ ResetField:
 NewRound:
 		mov WaitingTime,-1
 		;玩家1
-		mov [YourTank],5	;tank number 1->2 开始的时候是哪个坦克
-		mov [YourTank+4],128;坦克左移到边界,坦克初始位置横坐标
-		mov [YourTank+8],448;坦克初始位置纵坐标
-		mov [YourTank+12],3 ;坦克初始朝向，0向右，顺时针增加0-3
-		mov [YourTank+16],7 ;子弹类型
+		mov [YourPlane],5	;plane number 1->2 开始的时候是哪个飞机
+		mov [YourPlane+4],128;飞机左移到边界,飞机初始位置横坐标
+		mov [YourPlane+8],448;飞机初始位置纵坐标
+		mov [YourPlane+12],3 ;飞机初始朝向，0向右，顺时针增加0-3
+		mov [YourPlane+16],7 ;子弹类型
 		;玩家2
-		mov [YourTank+32],2
-		mov [YourTank+36],320
-		mov [YourTank+40],448
-		mov [YourTank+44],3
-		mov [YourTank+48],0
+		mov [YourPlane+32],2
+		mov [YourPlane+36],320
+		mov [YourPlane+40],448
+		mov [YourPlane+44],3
+		mov [YourPlane+48],0
 		;判断是否双人，双人就把玩家2标志清0，则后面绘制的时候就不会对玩家2相关数据进行绘制
 		cmp IsDoublePlayer,0
 		jne InitEnemyLife
-		mov [YourTank+32],0	;把玩家2的坦克和生命都清0
+		mov [YourPlane+32],0	;把玩家2的飞机和生命都清0
 		mov [YourLife+4],0
 		;注意，这里没有jmp，所以无论单人还是双人，都会执行下面的InitEnemyLife
 
-		;初始化坦克生命，详见初始数据区关于说明RoundEnemy的说明
+		;初始化飞机生命，详见初始数据区关于说明RoundEnemy的说明
 	InitEnemyLife:
 		mov eax,[Round]	;计算偏置：ebx=Round×12，因为一个关卡对应3个DWORD数据
 		mov ebx,12
 		mul ebx
 		mov ebx,eax	
 
-		mov eax,[RoundEnemy+ebx] ;根据关卡初始化三种坦克的总生命
+		mov eax,[RoundEnemy+ebx] ;根据关卡初始化三种飞机的总生命
 		mov [EnemyLife],eax
 		mov eax,[RoundEnemy+ebx+4]
 		mov [EnemyLife+4],eax
 		mov eax,[RoundEnemy+ebx+8]
 		mov [EnemyLife+8],eax
 		
-		;清空敌方坦克和子弹（对应10行EnemyTank）
+		;清空敌方飞机和子弹（对应10行EnemyPlane）
 		mov ecx,10	
-		mov esi,offset EnemyTank
-	RemoveEnemyTank:
-		mov DWORD ptr [esi],0	;标记坦克为0不存在
+		mov esi,offset EnemyPlane
+	RemoveEnemyPlane:
+		mov DWORD ptr [esi],0	;标记飞机为0不存在
 		mov DWORD ptr [esi+16],0;标记子弹为0不存在
-		add esi,32				;换下一行（下一个坦克）
-		loop RemoveEnemyTank
+		add esi,32				;换下一行（下一个飞机）
+		loop RemoveEnemyPlane
 		
 		;初始化地图
 		mov eax,[Round]
@@ -1194,18 +1194,18 @@ DrawWall:
 	DrawWallReturn:
 		ret
 
-DrawTankAndBullet:
-;绘制坦克和子弹，根据yourtank的参数来选择对应的位图来实现绘制
+DrawPlaneAndBullet:
+;绘制飞机和子弹，根据yourplane的参数来选择对应的位图来实现绘制
 
-		mov esi,offset YourTank
+		mov esi,offset YourPlane
 		mov ecx,12	;why 12 times? 我发现改了之后并不会影响实际的子弹的运行，反倒是飞机隐形了。。。
-	DrawTankAndBulletLoop:
+	DrawPlaneAndBulletLoop:
 		push esi
 		mov eax,0
-		cmp [esi],eax;坦克是否为0
+		cmp [esi],eax;飞机是否为0
 		je GoToDrawBulletIThink
 		push ecx
-		mov eax,[esi];第几种坦克
+		mov eax,[esi];第几种飞机
 		inc eax
 		sal eax,3
 		;找到位图中的地址
@@ -1225,7 +1225,7 @@ DrawTankAndBullet:
 		add esi,16	;跳转到子弹的描述部分
 		mov eax,0
 		cmp [esi],eax	;是否为0（不存在）
-		je DrawTankAndBulletLoopContinue
+		je DrawPlaneAndBulletLoopContinue
 		push ecx
 		mov eax,[esi]
 		add eax,54
@@ -1238,10 +1238,10 @@ DrawTankAndBullet:
 		call DrawSpirit
 		pop ecx
 		
-	DrawTankAndBulletLoopContinue:
+	DrawPlaneAndBulletLoopContinue:
 		pop esi
-		add esi,32	;跳转到下一个坦克，进行绘制 最多可以存在12个吧？
-		loop DrawTankAndBulletLoop
+		add esi,32	;跳转到下一个飞机，进行绘制 最多可以存在12个吧？
+		loop DrawPlaneAndBulletLoop
 		ret
 
 DrawTree:
@@ -1336,7 +1336,7 @@ DrawSideBar:
 		;绘制“分数”
 
 		;每次更新分数板的操作
-		mov esi,[esp]			;仍然代表的是两个玩家 tank
+		mov esi,[esp]			;仍然代表的是两个玩家 plane
 		mov eax,[Score+4*esi]	;两个玩家对应的分数
 		mov esi,offset ScoreText;esi对应分数板字符串
 		add esi,5
@@ -1376,6 +1376,7 @@ DrawSideBar:
 
 		ret
 
+;TODO根据按下的按键修改状态。修改后交由PaintMessage里的DrawUI刷新
 TimerTick:
 		cmp WaitingTime,0;用来判断不同状态
 		jl DontWait
@@ -1402,94 +1403,94 @@ TimerTick:
 		
 		cmp UpKeyHold,1;向上键
 		jne TT@1
-		mov [YourTank+12],3;移动方向
-		sub [YourTank+8],4;移动的距离
-		push offset YourTank
+		mov [YourPlane+12],3;移动方向
+		sub [YourPlane+8],4;移动的距离
+		push offset YourPlane
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@1Bad
-		push offset YourTank
-		call GetTankRect
-		push offset YourTank
+		push offset YourPlane
+		call GetPlaneRect
+		push offset YourPlane
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@4
 	TT@1Bad:
-		add [YourTank+8],4
+		add [YourPlane+8],4
 		jmp TT@4
 	TT@1:
 		cmp DownKeyHold,1
 		jne TT@2
-		mov [YourTank+12],1
-		add [YourTank+8],4
-		push offset YourTank
+		mov [YourPlane+12],1
+		add [YourPlane+8],4
+		push offset YourPlane
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@2Bad
-		push offset YourTank
-		call GetTankRect
-		push offset YourTank
+		push offset YourPlane
+		call GetPlaneRect
+		push offset YourPlane
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@4
 	TT@2Bad:
-		sub [YourTank+8],4
+		sub [YourPlane+8],4
 		jmp TT@4
 	TT@2:
 		cmp LeftKeyHold,1
 		jne TT@3
-		mov [YourTank+12],2
-		sub [YourTank+4],4
-		push offset YourTank
+		mov [YourPlane+12],2
+		sub [YourPlane+4],4
+		push offset YourPlane
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@3Bad
-		push offset YourTank
-		call GetTankRect
-		push offset YourTank
+		push offset YourPlane
+		call GetPlaneRect
+		push offset YourPlane
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@4
 	TT@3Bad:
-		add [YourTank+4],4
+		add [YourPlane+4],4
 		jmp TT@4
 	TT@3:
 		cmp RightKeyHold,1
 		jne TT@4
-		mov [YourTank+12],0
-		add [YourTank+4],4
-		push offset YourTank
+		mov [YourPlane+12],0
+		add [YourPlane+4],4
+		push offset YourPlane
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@4Bad
-		push offset YourTank
-		call GetTankRect
-		push offset YourTank
+		push offset YourPlane
+		call GetPlaneRect
+		push offset YourPlane
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@4
 	TT@4Bad:
-		sub [YourTank+4],4
+		sub [YourPlane+4],4
 		jmp TT@4
 	TT@4:
 		cmp EnterKeyHold,1
@@ -1499,133 +1500,133 @@ TimerTick:
 		cmp IsDoublePlayer,0
 		jne TT@5
 	TT@5@@:
-		cmp DWORD ptr [YourTank+16],0
+		cmp DWORD ptr [YourPlane+16],0
 		jne TT@5
-		cmp DWORD ptr [YourTank],0
+		cmp DWORD ptr [YourPlane],0
 		je TT@5
-		mov ebx,[YourTank+12]
-		mov [YourTank+16],1
-		mov eax,[YourTank+4]
+		mov ebx,[YourPlane+12]
+		mov [YourPlane+16],1
+		mov eax,[YourPlane+4]
 		add eax,[BulletPosFix+4*ebx]
-		mov [YourTank+20],eax
-		mov eax,[YourTank+8]
+		mov [YourPlane+20],eax
+		mov eax,[YourPlane+8]
 		add eax,[BulletPosFix+16+4*ebx]
-		mov [YourTank+24],eax
-		mov eax,[YourTank+12]
-		mov [YourTank+28],eax
+		mov [YourPlane+24],eax
+		mov eax,[YourPlane+12]
+		mov [YourPlane+28],eax
 	TT@5:
 	
 		cmp WKeyHold,1
 		jne TT@6
-		mov [YourTank+12+32],3
-		sub [YourTank+8+32],4
-		push offset YourTank+32
+		mov [YourPlane+12+32],3
+		sub [YourPlane+8+32],4
+		push offset YourPlane+32
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@6Bad
-		push offset YourTank+32
-		call GetTankRect
-		push offset YourTank+32
+		push offset YourPlane+32
+		call GetPlaneRect
+		push offset YourPlane+32
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@9
 	TT@6Bad:
-		add [YourTank+8+32],4
+		add [YourPlane+8+32],4
 		jmp TT@9
 	TT@6:
 		cmp SKeyHold,1
 		jne TT@7
-		mov [YourTank+12+32],1
-		add [YourTank+8+32],4
-		push offset YourTank+32
+		mov [YourPlane+12+32],1
+		add [YourPlane+8+32],4
+		push offset YourPlane+32
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@7Bad
-		push offset YourTank+32
-		call GetTankRect
-		push offset YourTank+32
+		push offset YourPlane+32
+		call GetPlaneRect
+		push offset YourPlane+32
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@9
 	TT@7Bad:
-		sub [YourTank+8+32],4
+		sub [YourPlane+8+32],4
 		jmp TT@9
 	TT@7:
 		cmp AKeyHold,1
 		jne TT@8
-		mov [YourTank+12+32],2
-		sub [YourTank+4+32],4
-		push offset YourTank+32
+		mov [YourPlane+12+32],2
+		sub [YourPlane+4+32],4
+		push offset YourPlane+32
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@8Bad
-		push offset YourTank+32
-		call GetTankRect
-		push offset YourTank+32
+		push offset YourPlane+32
+		call GetPlaneRect
+		push offset YourPlane+32
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@9
 	TT@8Bad:
-		add [YourTank+4+32],4
+		add [YourPlane+4+32],4
 		jmp TT@9
 	TT@8:
 		cmp DKeyHold,1
 		jne TT@9
-		mov [YourTank+12+32],0
-		add [YourTank+4+32],4
-		push offset YourTank+32
+		mov [YourPlane+12+32],0
+		add [YourPlane+4+32],4
+		push offset YourPlane+32
 		push 1
 		call CheckCanGo
 		test eax,1
 		jz TT@9Bad
-		push offset YourTank+32
-		call GetTankRect
-		push offset YourTank+32
+		push offset YourPlane+32
+		call GetPlaneRect
+		push offset YourPlane+32
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		je TT@9
 	TT@9Bad:
-		sub [YourTank+4+32],4
+		sub [YourPlane+4+32],4
 		jmp TT@9
 	TT@9:
 		cmp SpaceKeyHold,1
 		jne TT@10
-		cmp DWORD ptr [YourTank+16+32],0
+		cmp DWORD ptr [YourPlane+16+32],0
 		jne TT@10
-		cmp DWORD ptr [YourTank+32],0
+		cmp DWORD ptr [YourPlane+32],0
 		je TT@10
-		mov ebx,[YourTank+12+32]
-		mov [YourTank+16+32],1
-		mov eax,[YourTank+4+32]
+		mov ebx,[YourPlane+12+32]
+		mov [YourPlane+16+32],1
+		mov eax,[YourPlane+4+32]
 		add eax,[BulletPosFix+4*ebx]
-		mov [YourTank+20+32],eax
-		mov eax,[YourTank+8+32]
+		mov [YourPlane+20+32],eax
+		mov eax,[YourPlane+8+32]
 		add eax,[BulletPosFix+16+4*ebx]
-		mov [YourTank+24+32],eax
-		mov eax,[YourTank+12+32]
-		mov [YourTank+28+32],eax
+		mov [YourPlane+24+32],eax
+		mov eax,[YourPlane+12+32]
+		mov [YourPlane+28+32],eax
 	TT@10:
 		mov ecx,12
-		lea esi,YourTank+16
+		lea esi,YourPlane+16
 		jmp TTLoopForBullet
 		
 	TTLoopForBulletContinue:
@@ -1708,7 +1709,7 @@ TimerTick:
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		pop esi
 		pop ecx
 		cmp eax,0
@@ -1719,10 +1720,10 @@ TimerTick:
 		push eax
 		call FromOnePart
 		test eax,1
-		jz TTBulletHitTank
+		jz TTBulletHitPlane
 		jmp TTCheckBulletDoom
 		
-	TTBulletHitTank:
+	TTBulletHitPlane:
 		mov edi,[ebx]
 		mov DWORD ptr [ebx],0
 		push ebx
@@ -1731,7 +1732,7 @@ TimerTick:
 		jne TTYouDie
 		push esi
 		sub esi,16
-		sub esi,offset YourTank
+		sub esi,offset YourPlane
 		sar esi,3
 		add [Score+esi],200
 		sub edi,3
@@ -1800,7 +1801,7 @@ TimerTick:
 	TTCreateNewEnemyDone:
 	
 		mov ecx,10
-		mov esi,offset EnemyTank
+		mov esi,offset EnemyPlane
 		jmp TTLoopForEnemy
 	TTEnemyLoopEnd:
 		add esi,32
@@ -1815,10 +1816,10 @@ TimerTick:
 		sal ebx,3
 		add ebx,[esi+12]
 		mov eax,[esi+4]
-		add eax,[TankMove+4*ebx]
+		add eax,[PlaneMove+4*ebx]
 		mov [esi+4],eax
 		mov eax,[esi+8]
-		add eax,[TankMove+16+4*ebx]
+		add eax,[PlaneMove+16+4*ebx]
 		mov [esi+8],eax
 		push esi
 		push ecx
@@ -1833,14 +1834,14 @@ TimerTick:
 		push ecx
 		push esi
 		push esi
-		call GetTankRect
+		call GetPlaneRect
 		mov esi,[esp]
 		push esi
 		push edx
 		push ecx
 		push ebx
 		push eax
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		pop esi
 		pop ecx
@@ -1852,10 +1853,10 @@ TimerTick:
 		sal ebx,3
 		add ebx,[esi+12]
 		mov eax,[esi+4]
-		sub eax,[TankMove+4*ebx]
+		sub eax,[PlaneMove+4*ebx]
 		mov [esi+4],eax
 		mov eax,[esi+8]
-		sub eax,[TankMove+16+4*ebx]
+		sub eax,[PlaneMove+16+4*ebx]
 		mov [esi+8],eax
 		mov eax,4
 		call RandomRange
@@ -1894,10 +1895,10 @@ TimerTick:
 		mov WaitingTime,20
 	TTBeseNotThreatened:
 	
-		cmp [YourTank],0
-		jne TTYouDontNeedResetTankA
+		cmp [YourPlane],0
+		jne TTYouDontNeedResetPlaneA
 		cmp [YourLife],0
-		jle TTYouDontNeedResetTankA
+		jle TTYouDontNeedResetPlaneA
 		push 0
 		push 480
 		push 160
@@ -1905,26 +1906,26 @@ TimerTick:
 		push 128
 		call GetBulletInRect
 		cmp eax,0
-		jne TTYouDontNeedResetTankA
+		jne TTYouDontNeedResetPlaneA
 		push 0
 		push 480
 		push 160
 		push 448
 		push 128
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
-		jne TTYouDontNeedResetTankA
-		mov [YourTank],1
-		mov [YourTank+4],128
-		mov [YourTank+8],448
-		mov [YourTank+12],3
+		jne TTYouDontNeedResetPlaneA
+		mov [YourPlane],1
+		mov [YourPlane+4],128
+		mov [YourPlane+8],448
+		mov [YourPlane+12],3
 		dec [YourLife]
-	TTYouDontNeedResetTankA:
+	TTYouDontNeedResetPlaneA:
 			
-		cmp [YourTank+32],0
-		jne TTYouDontNeedResetTankB
+		cmp [YourPlane+32],0
+		jne TTYouDontNeedResetPlaneB
 		cmp [YourLife+4],0
-		jle TTYouDontNeedResetTankB
+		jle TTYouDontNeedResetPlaneB
 		push 0
 		push 480
 		push 352
@@ -1932,32 +1933,32 @@ TimerTick:
 		push 320
 		call GetBulletInRect
 		cmp eax,0
-		jne TTYouDontNeedResetTankB
+		jne TTYouDontNeedResetPlaneB
 		push 0
 		push 480
 		push 352
 		push 448
 		push 320
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
-		jne TTYouDontNeedResetTankB
-		mov [YourTank+32],2
-		mov [YourTank+4+32],320
-		mov [YourTank+8+32],448
-		mov [YourTank+12+32],3
+		jne TTYouDontNeedResetPlaneB
+		mov [YourPlane+32],2
+		mov [YourPlane+4+32],320
+		mov [YourPlane+8+32],448
+		mov [YourPlane+12+32],3
 		dec [YourLife+4]
-	TTYouDontNeedResetTankB:
+	TTYouDontNeedResetPlaneB:
 	
 	TimerTickReturn:
 		ret
 		
 FromOnePart:
 		mov eax,1
-		cmp DWORD ptr [esp+4],offset EnemyTank
+		cmp DWORD ptr [esp+4],offset EnemyPlane
 		jb FOP1
 		xor eax,1
 	FOP1:
-		cmp DWORD ptr [esp+8],offset EnemyTank
+		cmp DWORD ptr [esp+8],offset EnemyPlane
 		jb FOP2
 		xor eax,1
 	FOP2:
@@ -1965,7 +1966,7 @@ FromOnePart:
 
 IsEnemy:
 		mov eax,0
-		cmp DWORD ptr [esp+4],offset EnemyTank
+		cmp DWORD ptr [esp+4],offset EnemyPlane
 		jb NoIsntEnemy
 		mov eax,1
 	NoIsntEnemy:
@@ -1976,7 +1977,7 @@ HaveEnemy:
 		push esi
 		mov eax,0
 		mov ecx,10
-		mov esi,offset EnemyTank
+		mov esi,offset EnemyPlane
 	HaveEnemyLoop:
 		cmp DWORD ptr[esi],0
 		je NoEnemy
@@ -1998,7 +1999,7 @@ CreateRandomEnemy:
 		cmp DWORD ptr [EnemyLife+edi*4],0
 		jle CreateEnemyRetry
 		mov ecx,10
-		mov esi,offset EnemyTank
+		mov esi,offset EnemyPlane
 		jmp SearchForIdle
 
 	CreateEnemyRetry:
@@ -2028,7 +2029,7 @@ CreateRandomEnemy:
 		push 0
 		sub ebx,32
 		push ebx
-		call GetTankInRect
+		call GetPlaneInRect
 		cmp eax,0
 		jne CreateRandomEnemyDone
 
@@ -2041,22 +2042,22 @@ CreateRandomEnemy:
 	CreateRandomEnemyDone:
 		ret
 
-GetTankInRect:
+GetPlaneInRect:
 		push ebp
 		mov ebp,esp
 		push ecx
 		push esi
 		push ebx
 		mov ecx,12
-		mov esi,offset YourTank
-	GetTankLoop:
+		mov esi,offset YourPlane
+	GetPlaneLoop:
 		cmp DWORD ptr [esi],0
-		je GetTankLoopContinue
+		je GetPlaneLoopContinue
 		cmp esi,[ebp+24]
-		je GetTankLoopContinue
+		je GetPlaneLoopContinue
 		push ecx
 		push esi
-		call GetTankRect
+		call GetPlaneRect
 		push edx
 		push ecx
 		push ebx
@@ -2068,16 +2069,16 @@ GetTankInRect:
 		call RectConflict
 		test eax,1
 		pop ecx
-		jnz GetTankLoopSucceed
-	GetTankLoopContinue:
+		jnz GetPlaneLoopSucceed
+	GetPlaneLoopContinue:
 		add esi,32
-		loop GetTankLoop
-	GetTankLoopFail:
+		loop GetPlaneLoop
+	GetPlaneLoopFail:
 		mov eax,0
-		jmp GetTankDone
-	GetTankLoopSucceed:
+		jmp GetPlaneDone
+	GetPlaneLoopSucceed:
 		mov eax,esi
-	GetTankDone:
+	GetPlaneDone:
 		pop ebx
 		pop esi
 		pop ecx
@@ -2093,7 +2094,7 @@ GetBulletInRect:
 		push esi
 		push ebx
 		mov ecx,12
-		mov esi,offset YourTank
+		mov esi,offset YourPlane
 		add esi,16
 	GetBulletLoop:
 		cmp DWORD ptr [esi],1
@@ -2140,13 +2141,13 @@ CheckCanGo:
 		jne CheckBulletCanGo
 
 		push esi
-		call GetTankRect
-		jmp CheckTankCanGo
+		call GetPlaneRect
+		jmp CheckPlaneCanGo
 	CheckBulletCanGo:
 	
 		push esi
 		call GetBulletRect
-	CheckTankCanGo:
+	CheckPlaneCanGo:
 		mov BreakWallPos,1000
 		cmp eax,0
 		jl CheckCanGoFail
@@ -2263,8 +2264,8 @@ GetBulletRect:	; &bullet
 		add edx,12
 		ret 4
 		
-GetTankRect:	; &tank
-		mov esi,[esp+4];esi = yourtank
+GetPlaneRect:	; &plane
+		mov esi,[esp+4];esi = yourplane
 		mov eax,[esi+4];eax = x
 		mov ebx,[esi+8];ebx = y
 		add eax,4
@@ -2275,7 +2276,7 @@ GetTankRect:	; &tank
 		add edx,24;飞机位置矩阵的4个坐标
 		ret 4
 
-GetBlockRect:	; x,y,istank
+GetBlockRect:	; x,y,isplane
 		push ebp
 		mov ebp,esp
 		mov eax,[ebp+12]
